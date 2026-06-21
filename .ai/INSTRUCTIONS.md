@@ -98,6 +98,8 @@ O ideal é implementar em blocos:
 
 Nem toda feature exige todos esses blocos.
 
+No bloco de testes, cada teste unitário (ou de integração) escrito deve ser documentado em `tests.md`, dentro da pasta da feature, indicando qual regra de negócio ou critério de aceite ele cobre, o cenário testado e o status (passou/falhou/pendente). Esse arquivo é o que a fase de validação (Fase 7) usa para confirmar que a cobertura de testes é real, em vez de assumida.
+
 ---
 
 ## 7. Fase 7 — Validação contra a spec
@@ -107,6 +109,10 @@ Após implementar, a IA deve revisar o resultado contra os critérios de aceite.
 Use o prompt **"4. Validar contra a spec"** em `prompts.md`.
 
 A entrega só deve ser considerada finalizada quando os critérios de aceite forem atendidos.
+
+A IA deve cruzar essa validação com o `tests.md`: se um critério de aceite ou regra de negócio não tiver teste correspondente, isso deve aparecer como pendência na revisão, não ser ignorado.
+
+O resultado desta validação deve ser registrado em `review.md`, dentro da pasta da feature (`.ai/specs/[nome-da-feature]/review.md`), com uma nova entrada a cada execução da revisão — sem sobrescrever as anteriores. É o que dá ao desenvolvedor um histórico de revisões cruzando implementação e spec, sem precisar repetir a análise do zero a cada rodada.
 
 ---
 
@@ -221,9 +227,11 @@ Depois da implementação, confirme:
 - [ ] A interface possui estados de loading, erro, vazio e sucesso quando necessário
 - [ ] O backend valida os dados corretamente
 - [ ] Os testes necessários foram executados
+- [ ] Os testes estão documentados em tests.md, cobrindo as regras de negócio e critérios de aceite relevantes
 - [ ] A documentação foi atualizada quando necessário
 - [ ] Não houve alteração fora do escopo sem justificativa
 - [ ] O build-logs.md contém as decisões relevantes tomadas durante a implementação
+- [ ] O review.md contém uma entrada com o resultado da validação contra a spec.md
 ```
 
 ---

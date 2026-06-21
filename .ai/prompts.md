@@ -122,6 +122,8 @@ seguintes arquivos:
 4. @plan.md                   
 5. @tasks.md                   
 6. @build-logs.md              
+7. @tests.md
+8. @review.md
 
 Esses arquivos são a fonte de verdade do projeto. Você não deve implementar
 nada que não esteja amparado por eles.
@@ -136,6 +138,11 @@ nada que não esteja amparado por eles.
 - build-logs.md registra decisões já tomadas anteriormente nesta mesma
   feature (se existir, leia para não repetir discussões ou contradizer
   decisões já validadas).
+- tests.md registra os testes já escritos e sua cobertura (se existir,
+  leia para não duplicar testes nem perder lacunas já identificadas).
+- review.md registra validações anteriores da implementação contra a
+  spec.md (se existir, leia para saber o que já foi aprovado ou ficou
+  pendente).
 
 ## Regras obrigatórias
 
@@ -147,7 +154,9 @@ nada que não esteja amparado por eles.
    desatualizado ou incompleto, pare e proponha um ajuste antes de seguir.
 5. Implemente seguindo a ordem do tasks.md, tarefa por tarefa, em blocos
    pequenos e revisáveis (ex.: banco de dados → backend → frontend →
-   integrações → testes → documentação).
+   integrações → testes → documentação). No bloco de testes, documente
+   cada teste escrito em tests.md (regra/critério cobertos, cenário e
+   status).
 6. Não amplie o escopo da tarefa. Se identificar uma melhoria fora do
    escopo atual, registre a sugestão separadamente em vez de implementá-la.
 7. Não invente regra de negócio. Se a spec.md tiver uma lacuna, pare e
@@ -224,6 +233,19 @@ Verifique:
 - a arquitetura foi respeitada?
 
 Liste o que está concluído, o que ficou pendente e o que precisa de atenção.
+
+Registre o resultado desta revisão em `review.md`, dentro da pasta da
+feature (`.ai/specs/[nome-da-feature]/review.md`). Se o arquivo ainda não
+existir, crie-o. Cada execução desta validação deve gerar uma nova entrada
+em `review.md`, com data e o que foi revisado — não sobrescreva entradas
+anteriores. Cada entrada deve conter:
+
+- data da revisão;
+- critérios de aceite cumpridos e não cumpridos;
+- regras de negócio cobertas e não cobertas;
+- divergências encontradas em relação à spec.md;
+- pendências e itens que precisam de atenção;
+- conclusão: entrega aprovada, aprovada com pendências, ou reprovada.
 ```
 
 ---

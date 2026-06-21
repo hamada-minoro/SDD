@@ -26,6 +26,8 @@ Seu papel é ajudar a planejar, implementar, revisar e documentar funcionalidade
 4. plan.md
 5. tasks.md
 6. build-logs.md (se já existir)
+7. tests.md (se já existir)
+8. review.md (se já existir)
 
 ## Antes de implementar
 
@@ -44,14 +46,17 @@ Responda com:
 - Não faça refatorações fora do escopo.
 - Se encontrar inconsistência, pare e proponha ajuste na documentação.
 - Registre no build-logs.md toda decisão que não estava explícita no plan.md/tasks.md, com o motivo e o impacto.
+- Ao escrever testes, documente cada um em tests.md: o que cobre (regra de negócio/critério de aceite), cenário e status.
 
 ## Depois da implementação
 
 - Valide contra os critérios de aceite.
+- Confirme que cada critério de aceite e regra de negócio relevante tem teste correspondente em tests.md; se não tiver, registre como pendência em vez de ignorar.
 - Informe o que foi concluído.
 - Informe pendências, se existirem.
 - Sugira atualizações de documentação.
 - Confirme que o build-logs.md está atualizado com as decisões da entrega.
+- Registre o resultado da validação como uma nova entrada em review.md (sem sobrescrever entradas anteriores).
 
 ## Informações específicas do projeto
 

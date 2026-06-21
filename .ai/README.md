@@ -26,7 +26,7 @@ A IA não deve começar codando. Ela deve primeiro entender:
 
 Somente depois disso a IA pode iniciar a implementação.
 
-O fluxo base deste projeto usa seis arquivos principais:
+O fluxo base deste projeto usa oito arquivos principais:
 
 ```txt
 ai-instructions.md
@@ -35,11 +35,13 @@ spec.md
 plan.md
 tasks.md
 build-logs.md
+tests.md
+review.md
 ```
 
 Cada um possui uma função específica dentro do processo.
 
-Os cinco primeiros guiam o que será construído e como. O `build-logs.md` registra o que de fato aconteceu durante a construção: cada decisão técnica relevante, cada desvio do plano e o motivo por trás deles. É o que garante que o desenvolvedor humano tenha rastreabilidade total sobre o trabalho da IA, mesmo sem ter acompanhado a implementação em tempo real.
+Os cinco primeiros (`ai-instructions.md` a `tasks.md`) guiam o que será construído e como. O `build-logs.md` registra o que de fato aconteceu durante a construção: cada decisão técnica relevante, cada desvio do plano e o motivo por trás deles. O `tests.md` documenta os testes unitários (e de integração) escritos para a feature, cruzando cada teste com a regra de negócio ou critério de aceite que ele cobre. O `review.md` registra o resultado de cada validação da implementação contra a `spec.md`. Juntos, `build-logs.md`, `tests.md` e `review.md` dão ao desenvolvedor rastreabilidade total sobre o trabalho da IA, mesmo sem ter acompanhado a implementação em tempo real.
 
 ---
 
@@ -78,7 +80,9 @@ projeto/
 │       └── nome-da-feature/
 │           ├── spec.md
 │           ├── plan.md
-│           └── tasks.md
+│           ├── tasks.md
+│           ├── tests.md
+│           └── review.md
 └── src/
 ```
 
@@ -214,7 +218,48 @@ A IA deve implementar seguindo essa ordem, marcando o progresso conforme avança
 
 ---
 
-### 4.6 `build-logs.md`
+### 4.6 `tests.md`
+
+Este arquivo documenta os testes unitários (e de integração, quando aplicável) escritos para a feature.
+
+Ele responde à pergunta:
+
+> O que foi testado, como, e isso cobre as regras de negócio da spec?
+
+Deve conter:
+
+- referência de qual regra de negócio ou critério de aceite cada teste cobre;
+- cenário testado e resultado esperado;
+- status do teste (passou, falhou, pendente);
+- casos de borda cobertos e não cobertos (com o motivo, quando não cobertos).
+
+A IA deve atualizar este arquivo durante o bloco "Testes" da implementação (item 5 da ordem sugerida em `tasks.md`/`plan.md`), e ele serve de insumo para a revisão registrada em `review.md`.
+
+---
+
+### 4.7 `review.md`
+
+Este arquivo registra o histórico de validações da implementação contra a `spec.md`.
+
+Ele responde à pergunta:
+
+> O que foi entregue realmente cumpre o que a spec pedia?
+
+Diferente de `spec.md`, `plan.md` e `tasks.md` (escritos antes de codar), `review.md` é escrito *depois* — uma entrada nova a cada execução da validação (Fase 7), sem sobrescrever entradas anteriores. Cada entrada deve registrar:
+
+- data da revisão;
+- critérios de aceite cumpridos e não cumpridos;
+- regras de negócio cobertas e não cobertas;
+- casos de erro e permissões verificados;
+- se os testes em `tests.md` cobrem o que foi revisado;
+- pendências encontradas;
+- conclusão: aprovada, aprovada com pendências, ou reprovada.
+
+Sem o `review.md`, cada validação fica só na conversa com a IA e se perde — o desenvolvedor não tem como comparar revisões ao longo do tempo nem provar que a entrega foi de fato conferida contra a spec.
+
+---
+
+### 4.8 `build-logs.md`
 
 Este é o diário de decisões da implementação.
 
@@ -258,6 +303,8 @@ Antes de desenvolver, a IA deve ler os arquivos nesta ordem:
 4. plan.md
 5. tasks.md
 6. build-logs.md (se já existir, para entender decisões anteriores)
+7. tests.md (se já existir, para não duplicar testes já escritos)
+8. review.md (se já existir, para saber o que já foi validado antes)
 ```
 
 A ordem importa.
@@ -270,6 +317,8 @@ Motivo:
 4. `plan.md` define como construir.
 5. `tasks.md` define a ordem de execução.
 6. `build-logs.md` mostra o que já foi decidido antes, evitando que a IA repita discussões ou contradiga decisões já tomadas.
+7. `tests.md` mostra o que já foi testado, evitando testes duplicados e mostrando lacunas de cobertura.
+8. `review.md` mostra o que já foi validado contra a spec antes, evitando repetir uma revisão do zero.
 
 A IA não deve iniciar implementação se não tiver lido os arquivos necessários.
 
@@ -308,7 +357,9 @@ IA implementa tarefa por tarefa
         ↓
 IA registra decisões relevantes no build-logs.md
         ↓
-IA testa e valida contra a spec
+IA escreve testes e documenta em tests.md
+        ↓
+IA valida a entrega contra a spec e registra em review.md
         ↓
 IA atualiza documentação se necessário
         ↓
@@ -331,6 +382,8 @@ Resumo rápido:
 | `plan.md` | Como vamos construir? | Define estratégia técnica de implementação |
 | `tasks.md` | Quais passos executar? | Define checklist objetiva de desenvolvimento |
 | `build-logs.md` | O que aconteceu e por quê? | Registra decisões reais tomadas durante a implementação |
+| `tests.md` | O que foi testado? | Documenta testes unitários/integração e sua cobertura sobre a spec |
+| `review.md` | A entrega cumpre a spec? | Registra o histórico de validações da implementação contra a spec.md |
 
 ---
 
@@ -365,9 +418,11 @@ spec.md             → contrato funcional da feature
 plan.md             → estratégia técnica da entrega
 tasks.md            → execução controlada passo a passo
 build-logs.md       → memória das decisões tomadas durante a entrega
+tests.md            → evidência de que o comportamento foi testado
+review.md           → memória das validações da entrega contra a spec
 ```
 
-A IA só deve codar depois que esses níveis estiverem claros, e deve manter o `build-logs.md` atualizado enquanto codifica — é o que permite ao desenvolvedor entender, depois, tudo o que aconteceu e por quê.
+A IA só deve codar depois que esses níveis estiverem claros, e deve manter o `build-logs.md`, o `tests.md` e o `review.md` atualizados enquanto codifica e valida — é o que permite ao desenvolvedor entender, depois, tudo o que aconteceu, o que foi testado e o que foi conferido contra a spec.
 
 ---
 
