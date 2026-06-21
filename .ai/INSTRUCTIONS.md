@@ -7,13 +7,31 @@
 
 ---
 
+## 0. Fase 0 — Setup do projeto
+
+Antes de criar qualquer feature, a IA precisa entender o projeto real onde o framework `.ai/` foi instalado — não basta copiar a pasta e deixar `architecture.md` genérico.
+
+Use o prompt **"0. Setup — Analisar o projeto e gerar architecture.md"** em `prompts.md`.
+
+Nesta fase a IA deve:
+
+- mapear o projeto por completo: propósito, stack, estrutura de pastas, padrões de código, backend, frontend, banco de dados, autenticação, integrações, scripts de build/deploy/testes;
+- se a raiz for um monorepo ou contiver múltiplos projetos (frontend, backend, lambdas, serviços separados), documentar cada um individualmente e como eles se comunicam entre si;
+- perguntar ao desenvolvedor se a próxima feature deve ser especificada dentro de um fluxo específico do ecossistema (ex.: só backend, só um serviço) ou tratada como feature geral, em aberto;
+- gerar o conteúdo completo e robusto de `architecture.md` com base no que encontrou;
+- sugerir, e perguntar ao desenvolvedor antes de gravar, informações específicas do projeto para enriquecer o `ai-instructions.md` (convenções, ferramentas obrigatórias, restrições de segurança, limites entre projetos do ecossistema, etc.).
+
+Esta fase só precisa ser executada uma vez por projeto (ou sempre que a arquitetura mudar de forma relevante). É o que garante que as fases seguintes — spec, plano, tarefas e implementação — estejam ancoradas na realidade do projeto, e não em um template vazio.
+
+---
+
 ## 1. Fase 1 — Criação da especificação
 
 A primeira etapa é transformar uma ideia em uma `spec.md`.
 
 Nesta fase, a IA deve ajudar a organizar a funcionalidade, mas não deve implementar código.
 
-Use o prompt **"Criar spec.md"** em `prompts.md`.
+Use o prompt **"1. Iniciar uma feature do zero"** em `prompts.md`.
 
 A IA deve devolver uma especificação organizada e também apontar dúvidas, lacunas e riscos.
 
@@ -21,9 +39,9 @@ A IA deve devolver uma especificação organizada e também apontar dúvidas, la
 
 ## 2. Fase 2 — Revisão da especificação
 
-Depois de criar a `spec.md`, a IA deve revisá-la antes de gerar o plano.
+Depois de criar a `spec.md`, a IA deve revisá-la criticamente antes de gerar o plano.
 
-Use o prompt **"Revisar spec.md"** em `prompts.md`.
+Essa revisão já faz parte do mesmo prompt **"1. Iniciar uma feature do zero"** em `prompts.md`: ele instrui a IA a primeiro ajudar a criar a spec e só depois revisá-la criticamente, antes de avançar para o plano.
 
 A IA deve atuar como revisora técnica e funcional. Se a spec estiver incompleta, ela deve propor melhorias antes de avançar.
 
@@ -33,7 +51,7 @@ A IA deve atuar como revisora técnica e funcional. Se a spec estiver incompleta
 
 Com a spec validada, a IA deve criar o `plan.md`.
 
-Use o prompt **"Criar plan.md"** em `prompts.md`.
+Esta etapa também é coberta pelo prompt **"1. Iniciar uma feature do zero"** em `prompts.md`, na sequência da revisão da spec.
 
 O plano deve respeitar a arquitetura existente. A IA não deve propor uma abordagem incompatível com o projeto sem explicar claramente o motivo.
 
@@ -43,7 +61,7 @@ O plano deve respeitar a arquitetura existente. A IA não deve propor uma aborda
 
 Depois do `plan.md`, a IA deve quebrar a implementação em tarefas.
 
-Use o prompt **"Criar tasks.md"** em `prompts.md`.
+Esta etapa fecha o fluxo do prompt **"1. Iniciar uma feature do zero"** em `prompts.md`: spec → revisão → plano → tarefas, tudo na mesma conversa, sem gerar código antes do fim.
 
 O objetivo do `tasks.md` é evitar que a IA tente implementar tudo de uma vez.
 
@@ -53,7 +71,7 @@ O objetivo do `tasks.md` é evitar que a IA tente implementar tudo de uma vez.
 
 Antes de desenvolver, a IA deve confirmar que leu os documentos na ordem correta e devolver um resumo do entendimento, antes de escrever qualquer código.
 
-Use o prompt mestre **"Ler arquivos e confirmar entendimento"** em `prompts.md`.
+Use o prompt **"2. Prompt para iniciar desenvolvimento"** em `prompts.md`.
 
 Essa etapa é importante para garantir que a IA entendeu o escopo antes de codar.
 
@@ -63,7 +81,9 @@ Essa etapa é importante para garantir que a IA entendeu o escopo antes de codar
 
 A implementação deve seguir o `tasks.md`, tarefa por tarefa.
 
-Use o prompt **"Implementação controlada"** em `prompts.md`.
+As regras de implementação já estão incluídas no mesmo prompt **"2. Prompt para iniciar desenvolvimento"** em `prompts.md`: depois que a IA confirma o entendimento, ela segue para a implementação em blocos pequenos, sem precisar de um prompt separado.
+
+Se a implementação já tiver começado e você só quiser retomar de onde parou, use o prompt **"3. Continuar feature já em andamento"** em vez de repetir a confirmação completa.
 
 A IA deve evitar grandes alterações de uma vez. Sempre que tomar uma decisão que não estava explícita no `plan.md` ou no `tasks.md` — escolher entre abordagens, desviar do plano, preencher uma lacuna da spec — a IA deve parar e adicionar uma entrada no `build-logs.md` antes de continuar. Isso vale mesmo para decisões pequenas, se elas não forem óbvias só de olhar o código depois.
 
@@ -84,7 +104,7 @@ Nem toda feature exige todos esses blocos.
 
 Após implementar, a IA deve revisar o resultado contra os critérios de aceite.
 
-Use o prompt **"Validar contra a spec"** em `prompts.md`.
+Use o prompt **"4. Validar contra a spec"** em `prompts.md`.
 
 A entrega só deve ser considerada finalizada quando os critérios de aceite forem atendidos.
 
@@ -116,7 +136,7 @@ A IA deve atualizar a documentação quando:
 - houver mudança no fluxo da funcionalidade;
 - alguma limitação importante for descoberta.
 
-Use o prompt **"Atualizar documentação"** em `prompts.md`.
+Use o prompt **"5. Atualizar documentação"** em `prompts.md`.
 
 ---
 

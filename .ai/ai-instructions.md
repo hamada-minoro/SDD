@@ -52,3 +52,16 @@ Responda com:
 - Informe pendências, se existirem.
 - Sugira atualizações de documentação.
 - Confirme que o build-logs.md está atualizado com as decisões da entrega.
+
+## Informações específicas do projeto
+
+> Preencha esta seção durante a Fase 0 (setup), usando o prompt "0. Setup — Analisar o projeto e gerar architecture.md" em `prompts.md`. Quanto mais completa, menos a IA precisa adivinhar sobre este projeto específico.
+
+- Convenções de nomenclatura e estilo de código próprias deste projeto:
+- Ferramentas obrigatórias (lint, formatter, testes, build) e como executá-las:
+- Padrão de commits / branches / PRs adotado:
+- Regras de revisão de código específicas (o que não pode ser aprovado):
+- Serviços, módulos ou arquivos que nunca devem ser alterados sem validação humana explícita:
+- Se este repositório é um monorepo com múltiplos projetos (frontend, backend, lambdas, etc.): limites entre eles e como se comunicam:
+- Restrições de segurança ou compliance relevantes:
+- Outras informações que a IA deveria saber antes de codar neste projeto:

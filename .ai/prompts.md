@@ -6,6 +6,66 @@
 
 ---
 
+## 0. Setup — Analisar o projeto e gerar `architecture.md`
+
+Use uma única vez ao instalar o framework `.ai/` em um projeto novo ou já existente, antes de criar qualquer spec. Sem esse passo, `architecture.md` fica genérico e a IA não tem como respeitar os padrões reais do projeto durante o desenvolvimento.
+
+```txt
+Antes de criarmos qualquer feature, quero que você analise este projeto por
+completo para gerar uma architecture.md robusta.
+
+O arquivo a ser escrito é `.ai/architecture.md` (dentro da pasta `.ai/` do
+projeto, não na raiz). Edite o arquivo que já existe nesse caminho — não
+crie um architecture.md novo em outro lugar.
+
+Faça uma varredura geral do repositório e identifique:
+
+- o que o projeto faz (propósito, domínio, principais funcionalidades);
+- a stack utilizada (linguagens, frameworks, bibliotecas principais);
+- a estrutura de pastas e o que cada pasta de alto nível representa;
+- os padrões de código existentes (nomenclatura, organização de módulos,
+  camadas, convenções);
+- como o backend está organizado (se existir);
+- como o frontend está organizado (se existir);
+- como o banco de dados está estruturado (tabelas, migrations, ORM);
+- autenticação e autorização;
+- integrações externas, filas, workers, jobs, lambdas ou serviços externos;
+- scripts de build, deploy e testes.
+
+Se esta pasta raiz for um monorepo ou contiver múltiplos projetos (ex.:
+frontend, backend, lambdas, serviços separados), identifique cada um deles
+separadamente: nome, propósito, stack própria, pasta raiz daquele projeto e
+como eles se comunicam entre si (API, eventos, fila, etc.). Documente essa
+visão de ecossistema antes de detalhar cada projeto individualmente.
+
+Depois da análise, me pergunte:
+
+> Você quer que a próxima feature seja especificada dentro de um fluxo
+> específico do ecossistema (ex.: só backend, só frontend, só o serviço X),
+> ou prefere deixar em aberto para eu tratar como uma feature geral que pode
+> tocar múltiplos projetos?
+
+Não crie spec.md, plan.md ou tasks.md ainda — esta etapa é só de
+mapeamento do projeto.
+
+Ao final, gere o conteúdo completo de `.ai/architecture.md`, organizado e
+detalhado o suficiente para que qualquer IA consiga, no futuro, planejar e
+implementar uma feature respeitando a arquitetura real do projeto.
+
+Além disso, com base no que você encontrou, sugira melhorias para o
+`.ai/ai-instructions.md` deste projeto: pontos específicos deste projeto
+que a IA deveria saber antes de codar (ex.: convenções específicas,
+ferramentas de lint/test obrigatórias, padrões de commit, regras de
+revisão, restrições de segurança, serviços que nunca devem ser alterados
+sem validação humana, limites entre os projetos do ecossistema etc.).
+Pergunte-me quais dessas informações eu quero adicionar antes de gravá-las
+na seção "Informações específicas do projeto" desse mesmo arquivo,
+`.ai/ai-instructions.md` — não crie um arquivo novo, edite o que já existe
+nesse caminho.
+```
+
+---
+
 ## 1. Iniciar uma feature do zero
 
 Use quando ainda não existe nada — nem spec, nem plano, nem tarefas.
@@ -42,110 +102,7 @@ Contexto da feature:
 
 ---
 
-## 2. Criar `spec.md`
-
-Use na Fase 1. A IA não deve gerar código nesta etapa.
-
-```txt
-Quero criar uma nova funcionalidade seguindo Spec Driven Development.
-Antes de codar, me ajude a criar uma spec.md completa.
-
-Contexto da feature:
-[descreva aqui]
-
-Objetivo:
-[descreva aqui]
-
-Regras conhecidas:
-[descreva aqui]
-
-Me ajude a transformar isso em uma spec.md com:
-- contexto
-- problema
-- objetivo
-- usuários envolvidos
-- fluxo funcional
-- regras de negócio
-- permissões
-- validações
-- telas
-- dados necessários
-- casos de erro
-- critérios de aceite
-- fora de escopo
-
-Não gere código neste momento.
-```
-
----
-
-## 3. Revisar `spec.md`
-
-Use na Fase 2, depois que a primeira versão da spec já existe.
-
-```txt
-Leia a spec.md abaixo e faça uma revisão crítica.
-
-Quero que você aponte:
-- ambiguidades
-- regras de negócio incompletas
-- riscos de implementação
-- fluxos não tratados
-- critérios de aceite fracos
-- possíveis conflitos com a arquitetura
-
-Não gere código ainda.
-```
-
----
-
-## 4. Criar `plan.md`
-
-Use na Fase 3, com a spec já validada.
-
-```txt
-Com base na spec.md e na architecture.md, crie um plan.md técnico para implementação.
-
-O plano deve conter:
-- resumo da solução
-- alterações no backend
-- alterações no frontend
-- alterações no banco de dados
-- endpoints necessários
-- componentes necessários
-- serviços afetados
-- validações
-- testes necessários
-- riscos técnicos
-- ordem recomendada de implementação
-
-Não implemente código ainda.
-```
-
----
-
-## 5. Criar `tasks.md`
-
-Use na Fase 4, com o plano já pronto.
-
-```txt
-Com base na spec.md e no plan.md, crie um tasks.md com uma checklist de implementação.
-
-As tarefas devem ser pequenas, objetivas e organizadas por área:
-- banco de dados
-- backend
-- frontend
-- integrações
-- testes
-- documentação
-- validação final
-
-Não implemente código ainda.
-```
-
----
-
-## 6. Prompt mestre — Ler arquivos e confirmar entendimento
+## 2. Prompt para iniciar desenvolvimento
 
 Use na Fase 5, sempre que `spec.md`, `plan.md` e `tasks.md` já estiverem prontos (ou parcialmente prontos) e você quiser que a IA leia tudo, confirme entendimento e só então comece a implementar.
 
@@ -159,12 +116,12 @@ INSTRUCTIONS.md deste projeto.
 Antes de qualquer linha de código, você deve ler — nesta ordem exata — os
 seguintes arquivos:
 
-1. ai-instructions.md          → [caminho/para/ai-instructions.md]
-2. architecture.md             → [caminho/para/architecture.md]
-3. spec.md                     → [caminho/para/spec.md]
-4. plan.md                     → [caminho/para/plan.md]
-5. tasks.md                    → [caminho/para/tasks.md]
-6. build-logs.md               → [caminho/para/build-logs.md] (se já existir)
+1. @ai-instructions.md         
+2. @architecture.md             
+3. @spec.md                     
+4. @plan.md                   
+5. @tasks.md                   
+6. @build-logs.md              
 
 Esses arquivos são a fonte de verdade do projeto. Você não deve implementar
 nada que não esteja amparado por eles.
@@ -227,26 +184,7 @@ específico desta rodada de implementação]
 
 ---
 
-## 7. Implementação controlada
-
-Use na Fase 6, depois que a IA já confirmou o entendimento com o prompt acima.
-
-```txt
-Agora implemente seguindo o tasks.md.
-
-Regras obrigatórias:
-- siga a ordem das tarefas
-- não implemente nada fora da spec.md
-- respeite architecture.md
-- não altere padrões existentes sem justificar
-- se encontrar uma lacuna, pare e proponha atualização da spec ou do plan
-- ao concluir cada bloco, explique brevemente o que foi feito
-- registre toda decisão técnica relevante no build-logs.md, com o motivo
-```
-
----
-
-## 8. Variante curta — continuar feature já em andamento
+## 3. Continuar feature já em andamento
 
 Use quando a implementação já começou e você só quer retomar o trabalho seguindo o mesmo rigor, sem repetir a fase de confirmação completa.
 
@@ -269,7 +207,7 @@ Regras:
 
 ---
 
-## 9. Validar contra a spec
+## 4. Validar contra a spec
 
 Use na Fase 7, depois que a implementação (ou um bloco dela) estiver concluída.
 
@@ -290,7 +228,7 @@ Liste o que está concluído, o que ficou pendente e o que precisa de atenção.
 
 ---
 
-## 10. Atualizar documentação
+## 5. Atualizar documentação
 
 Use na Fase 8, sempre que o que foi implementado divergir do que estava documentado.
 

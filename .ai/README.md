@@ -280,6 +280,8 @@ A IA não deve iniciar implementação se não tiver lido os arquivos necessári
 O fluxo ideal é:
 
 ```txt
+Setup do projeto (analisar arquitetura real e gerar architecture.md)
+        ↓
 Ideia ou necessidade
         ↓
 Criar ou atualizar spec.md
