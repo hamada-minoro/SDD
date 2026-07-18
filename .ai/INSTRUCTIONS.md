@@ -244,3 +244,16 @@ Dois pontos do `README.md` valem ser revisados sempre que o fluxo parecer estar 
 - **Modelo mental do fluxo** (`README.md`, seção 9): cada arquivo representa uma camada de contrato — comportamento da IA, arquitetura, spec, plano, execução e memória de decisões — e a IA só deve codar depois que essas camadas estiverem claras.
 
 Se você, como desenvolvedor, perceber que a IA está pulando etapas, gerando código sem plano ou inventando regras, volte para esses dois pontos antes de continuar.
+
+---
+
+## 13. Execução autônoma de specs pendentes (opcional)
+
+Todas as fases acima podem ser executadas em lote, sem acompanhamento em tempo real, quando houver várias specs prontas acumuladas em `.ai/specs/`.
+
+1. Garanta que a Fase 0 foi executada (`architecture.md` e `ai-instructions.md` fiéis ao projeto) e que cada spec pendente tem ao menos um `spec.md` completo (o agente cria `plan.md`/`tasks.md` a partir de `.ai/specs/template/` quando faltam).
+2. Abra o Claude Code na raiz do projeto e invoque `/executar-specs-pendentes`.
+3. O loop processa uma spec por vez, em subagente com contexto zerado, cumprindo o ciclo completo (leitura obrigatória → plan/tasks → implementação → testes → review → commit em branch própria) e move as aprovadas para `.ai/specs/concluidos/`.
+4. Revise depois: relatório final da rodada, `review.md`/`tests.md` de cada spec, entradas do `build-logs.md` (especialmente `⚠️ ÁREA SENSÍVEL:`) e as branches criadas. Push e PR são sempre seus, manuais.
+
+Detalhes completos em `.claude/README.md`.

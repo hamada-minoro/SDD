@@ -76,15 +76,35 @@ projeto/
 │   ├── ai-instructions.md
 │   ├── build-logs.md
 │   ├── architecture.md
+│   ├── architecture-<subprojeto>.md   # opcional — um por subprojeto, em monorepos
+│   ├── infraestrutura-testes.md       # referência verificada do ambiente local de testes
 │   └── specs/
-│       └── nome-da-feature/
+│       ├── template/                  # modelos dos cinco arquivos de spec — copie para criar uma feature
+│       │   ├── spec.md
+│       │   ├── plan.md
+│       │   ├── tasks.md
+│       │   ├── tests.md
+│       │   └── review.md
+│       ├── concluidos/                # specs finalizadas e aprovadas são movidas para cá
+│       └── nome-da-feature/           # uma pasta por feature pendente/em andamento
 │           ├── spec.md
 │           ├── plan.md
 │           ├── tasks.md
 │           ├── tests.md
 │           └── review.md
+├── .claude/                           # opcional — automação para Claude Code (ver .claude/README.md)
+│   ├── agents/executor-spec-sdd.md
+│   └── skills/executar-specs-pendentes/
 └── src/
 ```
+
+Sobre as peças além do fluxo base:
+
+- **`architecture-<subprojeto>.md`** — quando a raiz é um monorepo (ou agrupa vários projetos), `architecture.md` descreve os conceitos compartilhados do ecossistema e cada subprojeto ganha um arquivo próprio (ex.: `architecture-backend.md`, `architecture-frontend.md`). A IA lê o `architecture.md` geral e depois só o(s) arquivo(s) do(s) subprojeto(s) que a feature toca.
+- **`infraestrutura-testes.md`** — memória verificada do ambiente local de testes (portas reais, containers, como subir a stack, limitações conhecidas). Evita que cada sessão de IA redescubra — ou pior, assuma errado — como rodar testes de integração/E2E.
+- **`specs/template/`** — os modelos dos cinco arquivos de spec. Para criar uma feature, copie a pasta e renomeie. A automação também usa esses modelos quando precisa gerar `plan.md`/`tasks.md`.
+- **`specs/concluidos/`** — ciclo de vida das specs: pendente (em `specs/`) → aprovada na validação → movida para `concluidos/`. A fila de pendências é simplesmente o que ainda está em `specs/`.
+- **`.claude/`** — camada opcional de execução autônoma para o Claude Code (ver seção 10 e `.claude/README.md`).
 
 ---
 
@@ -299,12 +319,14 @@ Antes de desenvolver, a IA deve ler os arquivos nesta ordem:
 ```txt
 1. ai-instructions.md
 2. architecture.md
+2.1. architecture-<subprojeto>.md (se existirem, apenas os dos subprojetos que a feature toca)
 3. spec.md
 4. plan.md
 5. tasks.md
 6. build-logs.md (se já existir, para entender decisões anteriores)
 7. tests.md (se já existir, para não duplicar testes já escritos)
 8. review.md (se já existir, para saber o que já foi validado antes)
+9. infraestrutura-testes.md (se existir, antes de rodar testes de integração/E2E)
 ```
 
 A ordem importa.
@@ -426,7 +448,19 @@ A IA só deve codar depois que esses níveis estiverem claros, e deve manter o `
 
 ---
 
-## 10. Conclusão
+## 10. Execução autônoma de specs pendentes (opcional)
+
+Quando o projeto acumula várias specs prontas em `.ai/specs/`, é possível executá-las em lote com a camada de automação da pasta `.claude/` (Claude Code):
+
+- a skill **`/executar-specs-pendentes`** orquestra a fila: calcula a ordem (specs menores primeiro), dispara um subagente por spec e, ao final de cada uma, confere o `review.md` — só move para `concluidos/` o que foi **"Aprovada"** sem ressalvas;
+- o subagente **`executor-spec-sdd`** executa o ciclo SDD completo de uma única spec, em contexto zerado (sem memória das specs anteriores): leitura obrigatória na ordem da seção 5, `plan.md`/`tasks.md` a partir de `specs/template/` quando faltam, implementação tarefa por tarefa, testes, `review.md` e commit em branch própria (`feat/<slug>` ou `fix/<slug>`);
+- guarda-corpos fixos: nunca `git push`, nunca PR, nunca commit na branch padrão, nunca editar os arquivos do framework, e as proibições do `ai-instructions.md` prevalecem sobre a autonomia.
+
+O modo autônomo não substitui o fluxo das seções anteriores — ele o executa. A qualidade do resultado continua dependendo de specs bem escritas e de `architecture.md`/`ai-instructions.md` fiéis ao projeto (Fase 0). Detalhes de uso e revisão pós-rodada em `.claude/README.md`.
+
+---
+
+## 11. Conclusão
 
 Spec Driven Development com IA não é burocracia. É uma forma de dar contexto, direção e limites para a IA.
 

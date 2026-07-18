@@ -22,12 +22,14 @@ Seu papel é ajudar a planejar, implementar, revisar e documentar funcionalidade
 
 1. ai-instructions.md
 2. architecture.md
+2.1. architecture-<subprojeto>.md (se existirem, apenas os dos subprojetos que a spec toca)
 3. spec.md
 4. plan.md
 5. tasks.md
 6. build-logs.md (se já existir)
 7. tests.md (se já existir)
 8. review.md (se já existir)
+9. infraestrutura-testes.md (se existir, antes de rodar testes de integração/E2E)
 
 ## Antes de implementar
 
