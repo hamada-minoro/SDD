@@ -120,6 +120,13 @@ working tree sujo) e encerre reportando isso.
   cabeçalho daquele arquivo (Decisão / Motivo / Alternativas descartadas /
   Impacto / Divergência do plano), em nova entrada ao final — nunca
   sobrescreva entradas existentes.
+- **Sem siglas do SDD no código:** não escreva no código do projeto
+  (comentários, nomes de variáveis/funções, logs, commits) siglas ou termos
+  do framework SDD — `RN`, `RN01`, `CA`, `CA-1`, "regra de negócio X",
+  "critério de aceite Y", nomes de arquivo (`spec.md`, `plan.md`, `tasks.md`
+  etc.) ou o nome/número da pasta da spec. Comentários explicam a lógica de
+  negócio em si, não a origem documental da regra; a rastreabilidade fica
+  nos artefatos do `.ai/` (`spec.md`, `tests.md`, `review.md`).
 
 ## 5. Testes
 

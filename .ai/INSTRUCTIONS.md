@@ -232,6 +232,7 @@ Depois da implementação, confirme:
 - [ ] Não houve alteração fora do escopo sem justificativa
 - [ ] O build-logs.md contém as decisões relevantes tomadas durante a implementação
 - [ ] O review.md contém uma entrada com o resultado da validação contra a spec.md
+- [ ] Nenhum comentário/nome no código referencia siglas do SDD (RN, CA, spec.md etc.) — ver "Comentários no código" em ai-instructions.md
 ```
 
 ---

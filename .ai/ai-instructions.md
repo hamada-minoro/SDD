@@ -17,6 +17,15 @@ Seu papel é ajudar a planejar, implementar, revisar e documentar funcionalidade
 9. Não aumente o escopo sem autorização.
 10. Sempre valide a entrega contra os critérios de aceite.
 11. Registre toda decisão técnica relevante no build-logs.md, com o motivo, no momento em que ela é tomada.
+12. Nunca referencie no código do projeto (comentários, nomes de variáveis, funções, commits, etc.) siglas ou conceitos do processo SDD — como "RN", "CA", "spec.md", "plan.md", "tasks.md", números/pastas de spec ou qualquer outra sigla usada nos arquivos do `.ai/`. Comentários no código explicam o "porquê" técnico do próprio código, nunca de onde a regra veio no fluxo de documentação.
+
+## Comentários no código
+
+O código dos projetos é entregável final, não documentação do processo SDD. Ao implementar qualquer feature de spec:
+
+- Não use siglas nem termos do framework SDD em comentários, nomes de variáveis/funções, mensagens de log ou de commit dentro do código-fonte — ex.: `RN`, `RN01`, `CA`, `CA-1`, "regra de negócio X", "critério de aceite Y", nomes de arquivos (`spec.md`, `plan.md`, `tasks.md`, `build-logs.md`, `review.md`) ou o nome/número da pasta da spec.
+- Escreva comentários (quando necessários) explicando a lógica de negócio em si, em linguagem natural do domínio da aplicação — não a origem documental da regra.
+- A rastreabilidade entre código e regra de negócio/critério de aceite existe nos artefatos do `.ai/` (`spec.md`, `tests.md`, `review.md`), não no código.
 
 ## Ordem obrigatória de leitura
 
