@@ -16,12 +16,12 @@ Use o prompt **"0. Setup — Analisar o projeto e gerar architecture.md"** em `p
 Nesta fase a IA deve:
 
 - mapear o projeto por completo: propósito, stack, estrutura de pastas, padrões de código, backend, frontend, banco de dados, autenticação, integrações, scripts de build/deploy/testes;
-- se a raiz for um monorepo ou contiver múltiplos projetos (frontend, backend, lambdas, serviços separados), documentar cada um individualmente e como eles se comunicam entre si;
+- se a raiz contiver vários projetos (APIs, frontends, microsserviços, lambdas, projetos complementares), transformar o `architecture.md` no mapa do ecossistema e criar **um `architecture-<pasta-do-projeto>.md` para cada projeto da raiz**, sem exceção (ver `README.md`, seção 3.2);
 - perguntar ao desenvolvedor se a próxima feature deve ser especificada dentro de um fluxo específico do ecossistema (ex.: só backend, só um serviço) ou tratada como feature geral, em aberto;
 - gerar o conteúdo completo e robusto de `architecture.md` com base no que encontrou;
 - sugerir, e perguntar ao desenvolvedor antes de gravar, informações específicas do projeto para enriquecer o `ai-instructions.md` (convenções, ferramentas obrigatórias, restrições de segurança, limites entre projetos do ecossistema, etc.).
 
-Esta fase só precisa ser executada uma vez por projeto (ou sempre que a arquitetura mudar de forma relevante). É o que garante que as fases seguintes — spec, plano, tarefas e implementação — estejam ancoradas na realidade do projeto, e não em um template vazio.
+Esta fase só precisa ser executada uma vez por projeto, ou sempre que a arquitetura mudar de forma relevante. Em raiz com vários projetos, rode-a de novo, focada no projeto novo, sempre que um projeto for adicionado à raiz. É o que garante que as fases seguintes — spec, plano, tarefas e implementação — estejam ancoradas na realidade do projeto, e não em um template vazio.
 
 ---
 
@@ -30,6 +30,10 @@ Esta fase só precisa ser executada uma vez por projeto (ou sempre que a arquite
 A primeira etapa é transformar uma ideia em uma `spec.md`.
 
 Nesta fase, a IA deve ajudar a organizar a funcionalidade, mas não deve implementar código.
+
+Antes de escrever a spec, crie a pasta da feature com o **próximo número da sequência**: veja o maior número usado em `.ai/specs/` e em `.ai/specs/concluidos/` e use o seguinte, com 3 dígitos (ex.: último `007-...` → nova pasta `008-nome-da-feature`). Copie `.ai/specs/template/` para essa pasta; ela já traz todos os arquivos da feature, inclusive o `build-logs.md`. O número define a ordem de execução da fila (detalhes em `README.md`, seção 3.1).
+
+A **primeira** seção a preencher na `spec.md` é "Projetos e arquiteturas envolvidos": com base no mapa do `architecture.md`, liste cada projeto que a feature altera e o caminho do `architecture-<projeto>.md` dele. Essa tabela é repetida no `plan.md` (com a ordem entre projetos) e vira itens de leitura na "Preparação" do `tasks.md`. É ela que limita o que a IA lê antes de executar: o mapa mais esses arquivos, nada além (`README.md`, seção 3.2).
 
 Use o prompt **"1. Iniciar uma feature do zero"** em `prompts.md`.
 
@@ -85,7 +89,7 @@ As regras de implementação já estão incluídas no mesmo prompt **"2. Prompt 
 
 Se a implementação já tiver começado e você só quiser retomar de onde parou, use o prompt **"3. Continuar feature já em andamento"** em vez de repetir a confirmação completa.
 
-A IA deve evitar grandes alterações de uma vez. Sempre que tomar uma decisão que não estava explícita no `plan.md` ou no `tasks.md` — escolher entre abordagens, desviar do plano, preencher uma lacuna da spec — a IA deve parar e adicionar uma entrada no `build-logs.md` antes de continuar. Isso vale mesmo para decisões pequenas, se elas não forem óbvias só de olhar o código depois.
+A IA deve evitar grandes alterações de uma vez. Sempre que tomar uma decisão que não estava explícita no `plan.md` ou no `tasks.md` — escolher entre abordagens, desviar do plano, preencher uma lacuna da spec — a IA deve parar e adicionar uma entrada no `build-logs.md` da feature (`.ai/specs/NNN-nome-da-feature/build-logs.md`) antes de continuar. Isso vale mesmo para decisões pequenas, se elas não forem óbvias só de olhar o código depois.
 
 O ideal é implementar em blocos:
 
@@ -112,7 +116,7 @@ A entrega só deve ser considerada finalizada quando os critérios de aceite for
 
 A IA deve cruzar essa validação com o `tests.md`: se um critério de aceite ou regra de negócio não tiver teste correspondente, isso deve aparecer como pendência na revisão, não ser ignorado.
 
-O resultado desta validação deve ser registrado em `review.md`, dentro da pasta da feature (`.ai/specs/[nome-da-feature]/review.md`), com uma nova entrada a cada execução da revisão — sem sobrescrever as anteriores. É o que dá ao desenvolvedor um histórico de revisões cruzando implementação e spec, sem precisar repetir a análise do zero a cada rodada.
+O resultado desta validação deve ser registrado em `review.md`, dentro da pasta da feature (`.ai/specs/NNN-nome-da-feature/review.md`), com uma nova entrada a cada execução da revisão — sem sobrescrever as anteriores. É o que dá ao desenvolvedor um histórico de revisões cruzando implementação e spec, sem precisar repetir a análise do zero a cada rodada.
 
 ---
 
@@ -127,7 +131,7 @@ spec.md
 plan.md
 tasks.md
 architecture.md
-build-logs.md
+build-logs.md (da feature)
 README.md
 CHANGELOG.md
 API.md
@@ -188,7 +192,7 @@ Se o código final divergir do plano, a documentação precisa ser atualizada.
 
 ### 9.8 Registrar toda decisão relevante no build-logs.md
 
-A IA não deve codar sem freio. Toda decisão técnica que não estava 100% explícita no `plan.md` ou no `tasks.md` — escolha entre abordagens, desvio de plano, preenchimento de lacuna da spec, introdução de dependência nova — deve ser registrada no `build-logs.md` com o motivo, no momento em que é tomada.
+A IA não deve codar sem freio. Toda decisão técnica que não estava 100% explícita no `plan.md` ou no `tasks.md` — escolha entre abordagens, desvio de plano, preenchimento de lacuna da spec, introdução de dependência nova — deve ser registrada no `build-logs.md` da própria feature com o motivo, no momento em que é tomada.
 
 Sem esse registro, o desenvolvedor não tem como saber o que foi decidido e por quê depois que a implementação termina.
 
@@ -199,6 +203,7 @@ Sem esse registro, o desenvolvedor não tem como saber o que foi decidido e por 
 Antes da implementação, confirme:
 
 ```md
+- [ ] A pasta da feature segue a numeração sequencial (NNN-nome-da-feature)
 - [ ] A feature tem uma spec.md clara
 - [ ] As regras de negócio estão documentadas
 - [ ] Existem critérios de aceite objetivos
@@ -207,6 +212,9 @@ Antes da implementação, confirme:
 - [ ] O tasks.md está quebrado em tarefas pequenas
 - [ ] A IA leu ai-instructions.md
 - [ ] A IA leu architecture.md
+- [ ] A spec, o plan e o tasks deixam explícitos os projetos e arquiteturas envolvidos (tabela "Projetos e arquiteturas envolvidos")
+- [ ] A IA leu o architecture-<projeto>.md de cada projeto da tabela, e não leu os de projetos fora dela
+- [ ] A IA leu infraestrutura-testes.md
 - [ ] A IA entendeu a ordem de implementação
 ```
 
@@ -230,9 +238,11 @@ Depois da implementação, confirme:
 - [ ] Os testes estão documentados em tests.md, cobrindo as regras de negócio e critérios de aceite relevantes
 - [ ] A documentação foi atualizada quando necessário
 - [ ] Não houve alteração fora do escopo sem justificativa
-- [ ] O build-logs.md contém as decisões relevantes tomadas durante a implementação
+- [ ] O build-logs.md da feature contém as decisões relevantes tomadas durante a implementação
 - [ ] O review.md contém uma entrada com o resultado da validação contra a spec.md
-- [ ] Nenhum comentário/nome no código referencia siglas do SDD (RN, CA, spec.md etc.) — ver "Comentários no código" em ai-instructions.md
+- [ ] Se a feature mudou a infraestrutura de testes, o infraestrutura-testes.md foi atualizado
+- [ ] NENHUM commit tem `Co-Authored-By:` listando IA, e nenhum commit, PR, código ou comentário traz a IA como autora ("Generated with ...", "🤖", nome de modelo)
+- [ ] Comentários de regra de negócio têm só o ID, sem descrição (`// 007-RN30`, `// 007-RN42, 007-CA10`), e nomes, logs, commits e branches não citam o SDD (ver "Comentários no código" em ai-instructions.md)
 ```
 
 ---
@@ -254,7 +264,7 @@ Todas as fases acima podem ser executadas em lote, sem acompanhamento em tempo r
 
 1. Garanta que a Fase 0 foi executada (`architecture.md` e `ai-instructions.md` fiéis ao projeto) e que cada spec pendente tem ao menos um `spec.md` completo (o agente cria `plan.md`/`tasks.md` a partir de `.ai/specs/template/` quando faltam).
 2. Abra o Claude Code na raiz do projeto e invoque `/executar-specs-pendentes`.
-3. O loop processa uma spec por vez, em subagente com contexto zerado, cumprindo o ciclo completo (leitura obrigatória → plan/tasks → implementação → testes → review → commit em branch própria) e move as aprovadas para `.ai/specs/concluidos/`.
-4. Revise depois: relatório final da rodada, `review.md`/`tests.md` de cada spec, entradas do `build-logs.md` (especialmente `⚠️ ÁREA SENSÍVEL:`) e as branches criadas. Push e PR são sempre seus, manuais.
+3. O loop processa uma spec por vez, na ordem numérica das pastas (`001`, `002`, …), em subagente com contexto zerado, cumprindo o ciclo completo (leitura obrigatória → plan/tasks → implementação → testes → review → commit em branch própria) e move as aprovadas para `.ai/specs/concluidos/`.
+4. Revise depois: relatório final da rodada, `review.md`/`tests.md` de cada spec, entradas do `build-logs.md` de cada spec (especialmente `⚠️ ÁREA SENSÍVEL:`) e as branches criadas. Push e PR são sempre seus, manuais.
 
 Detalhes completos em `.claude/README.md`.

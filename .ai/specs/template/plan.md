@@ -4,6 +4,14 @@
 
 Explique como a feature será implementada tecnicamente.
 
+## Projetos e arquiteturas envolvidos
+
+> Os mesmos da tabela "Projetos e arquiteturas envolvidos" da `spec.md`, nem mais nem menos. Se o plano descobrir que outro projeto precisa mudar, atualize a spec primeiro. Informe a ordem entre os projetos (ex.: API antes do frontend que a consome) e detalhe as seções abaixo por projeto quando mais de um for afetado.
+
+| Ordem | Projeto (pasta) | Arquitetura seguida | Impacto resumido |
+|---|---|---|---|
+| 1 | `pasta-do-projeto/` | `.ai/architecture-pasta-do-projeto.md` | |
+
 ## Impacto no backend
 
 - Módulos afetados:

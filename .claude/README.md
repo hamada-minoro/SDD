@@ -44,9 +44,20 @@ Duas camadas, de propósito:
    /executar-specs-pendentes
    ```
 
-3. Deixe rodar. O loop processa as specs da menor para a maior (linhas do
-   `spec.md`, empate por ordem alfabética) e **encerra sozinho** quando não
-   sobrar pendência, apresentando o relatório final.
+3. Deixe rodar. O loop processa as specs **na ordem numérica das pastas**
+   (`001-...`, `002-...`, …, empate por ordem alfabética) e **encerra
+   sozinho** quando não sobrar pendência, apresentando o relatório final.
+
+### Numeração das specs = ordem de execução
+
+A fila segue a mesma convenção de `.ai/README.md` (seção 3.1): cada pasta de
+spec se chama `NNN-nome-da-feature`, e o número é atribuído na criação como
+**o maior número já usado em `.ai/specs/` e `.ai/specs/concluidos/` + 1**.
+Quem quer que uma feature rode antes de outra cria a spec antes (número
+menor); a automação nunca reordena por outro critério.
+
+Pastas com `spec.md` mas **sem** prefixo numérico ficam fora da fila: o
+`fila.sh` avisa em stderr e o relatório final as lista para você renomear.
 
 Não precisa aprovar nada durante a rodada — o modo é autônomo por decisão de
 spec. Sua revisão acontece **depois**, sobre o resultado acumulado.
@@ -57,18 +68,21 @@ spec. Sua revisão acontece **depois**, sobre o resultado acumulado.
 bash .claude/skills/executar-specs-pendentes/scripts/fila.sh .ai/specs
 ```
 
-Saída: `<nº de linhas><TAB><nome da spec>`, já na ordem em que o loop vai
-processar. Útil antes de disparar uma rodada, para saber o que vem pela
+Saída: `<número><TAB><pasta da spec>`, já na ordem em que o loop vai
+processar (ex.: `003	003-exportar-relatorio`). Pastas sem numeração
+aparecem em stderr como `ignorada (sem numeração): <pasta>`. Útil antes de disparar uma rodada, para saber o que vem pela
 frente.
 
 ## O que o agente faz com cada spec
 
 Para cada spec pendente, o executor (em contexto limpo):
 
-1. Lê, na ordem obrigatória: `ai-instructions.md` → `architecture.md` →
-   `architecture-<subprojeto>.md` aplicáveis (se existirem) → `spec.md` →
-   `plan.md`/`tasks.md` (se existirem) → `build-logs.md`/`tests.md`/
-   `review.md` (se existirem) → `infraestrutura-testes.md` (se existir).
+1. Lê, na ordem obrigatória: `.ai/README.md` → `ai-instructions.md` →
+   `architecture.md` (mapa) → `infraestrutura-testes.md` → `spec.md` → `plan.md`/`tasks.md`
+   (se existirem) → `build-logs.md`/`tests.md`/`review.md` da spec (se
+   existirem). Das arquiteturas de projeto, lê **somente** as da tabela
+   "Projetos e arquiteturas envolvidos" da spec, logo depois do `spec.md`.
+   Se faltar alguma, a spec sai reprovada sem código.
 2. Confere se o(s) repositório(s) tocados estão com working tree limpo —
    se houver mudança não commitada de outra origem, **não toca em nada**,
    registra e marca a spec como reprovada.
@@ -79,9 +93,14 @@ Para cada spec pendente, o executor (em contexto limpo):
 5. Escreve os testes exigidos, roda lint/testes/build do projeto e documenta
    tudo em `tests.md`.
 6. Valida contra os critérios de aceite e registra nova entrada em
-   `review.md`; decisões não óbvias vão para `.ai/build-logs.md`.
-7. Commita na branch da spec, com a pasta da spec na mensagem (ex.:
-   `fix: ... (nome-da-spec)`).
+   `review.md`; decisões não óbvias vão para o `build-logs.md` da própria
+   spec (`.ai/specs/<spec>/build-logs.md`).
+7. Commita na branch da spec. O nome da branch é o nome da pasta sem o
+   número (`007-correcao-login` → `fix/correcao-login`), e a mensagem
+   descreve a mudança sem citar a spec (as regras do `ai-instructions.md`
+   proíbem referências ao SDD em commits; só os comentários de regra de
+   negócio usam o padrão `NNN-RNxx` / `NNN-CAxx`). A ligação spec → branch fica
+   no relatório final.
 
 A orquestradora então lê o `review.md` da spec:
 
@@ -96,17 +115,24 @@ retentadas quando você disparar uma nova rodada.
 
 - **Nunca dá `git push` nem abre/mescla PR.** Todo envio para o remoto é
   manual, seu, depois de revisar as branches.
+- **NENHUM `Co-Authored-By:`. NENHUMA IA é listada como
+  `Co-Authored-By:`**, nem "Generated with ...", "🤖" ou nome de modelo, em
+  nenhum commit. O autor é só o do seu `git config`. O executor confere o
+  último commit antes de encerrar, e a orquestradora confere as branches da
+  rodada.
 - **Nunca commita na branch padrão** (`main`/`master`) — sempre em branch
   própria por spec.
-- **Nunca edita os arquivos do framework** (`ai-instructions.md`,
-  `architecture*.md`, `README.md`, `INSTRUCTIONS.md`, `prompts.md`).
+- **Nunca edita os arquivos do framework** (`AGENTS.md`, `CLAUDE.md`,
+  `ai-instructions.md`, `architecture*.md`, `README.md`, `INSTRUCTIONS.md`,
+  `prompts.md`, `specs/template/`), nunca cria specs novas e nunca
+  renomeia ou renumera pastas de spec.
 - **Nunca implementa o que o `ai-instructions.md` proíbe** (a lista de
   "o que não pode ser aprovado" da seção "Informações específicas do
   projeto") — se uma spec pedir, essa parte não é feita, o conflito é
   documentado e a spec sai como reprovada.
 - Specs que tocam **áreas sensíveis** (a lista de "nunca alterar sem
   validação humana" do `ai-instructions.md`) são implementadas, mas ganham
-  entrada `⚠️ ÁREA SENSÍVEL:` no `.ai/build-logs.md` para você revisar com
+  entrada `⚠️ ÁREA SENSÍVEL:` no `build-logs.md` da spec para você revisar com
   atenção redobrada.
 
 ## Como revisar depois de uma rodada
@@ -115,8 +141,12 @@ retentadas quando você disparar uma nova rodada.
    criadas e alertas de área sensível.
 2. **`.ai/specs/concluidos/<spec>/`** — `review.md` (validação contra a
    spec) e `tests.md` (o que foi testado) de cada spec aprovada.
-3. **`.ai/build-logs.md`** — o porquê de cada decisão tomada; procure
-   entradas `⚠️ ÁREA SENSÍVEL:` primeiro.
+3. **`build-logs.md` de cada spec** — o porquê de cada decisão tomada;
+   procure entradas `⚠️ ÁREA SENSÍVEL:` primeiro:
+
+   ```bash
+   grep -rl "ÁREA SENSÍVEL" .ai/specs/*/build-logs.md .ai/specs/concluidos/*/build-logs.md
+   ```
 4. **Branches criadas** — em cada repositório tocado:
 
    ```bash

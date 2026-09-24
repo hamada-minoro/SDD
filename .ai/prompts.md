@@ -32,11 +32,24 @@ Faça uma varredura geral do repositório e identifique:
 - integrações externas, filas, workers, jobs, lambdas ou serviços externos;
 - scripts de build, deploy e testes.
 
-Se esta pasta raiz for um monorepo ou contiver múltiplos projetos (ex.:
-frontend, backend, lambdas, serviços separados), identifique cada um deles
-separadamente: nome, propósito, stack própria, pasta raiz daquele projeto e
-como eles se comunicam entre si (API, eventos, fila, etc.). Documente essa
-visão de ecossistema antes de detalhar cada projeto individualmente.
+Se esta pasta raiz contiver vários projetos (ex.: APIs, frontends,
+microsserviços, lambdas, projetos complementares, cada um com ou sem
+repositório git próprio), a documentação tem dois níveis obrigatórios:
+
+- `.ai/architecture.md` vira o MAPA DO ECOSSISTEMA: tabela com todos os
+  projetos da raiz (pasta, tipo, stack, se tem repositório próprio, arquivo
+  de arquitetura), como eles se comunicam (API, eventos, fila, banco
+  compartilhado), contratos compartilhados e conceitos comuns;
+- para CADA projeto da raiz, sem exceção, crie
+  `.ai/architecture-<nome-exato-da-pasta>.md` (ex.: `api-pedidos/` →
+  `.ai/architecture-api-pedidos.md`) com stack, estrutura de pastas,
+  padrões, banco, testes e restrições daquele projeto, usando as seções do
+  modelo `.ai/architecture.md`.
+
+Documente a visão de ecossistema antes de detalhar cada projeto.
+
+(Se eu pedir o setup de um único projeto novo adicionado à raiz, gere só o
+`architecture-<pasta>.md` dele e atualize a tabela do mapa do ecossistema.)
 
 Depois da análise, me pergunte:
 
@@ -48,7 +61,8 @@ Depois da análise, me pergunte:
 Não crie spec.md, plan.md ou tasks.md ainda — esta etapa é só de
 mapeamento do projeto.
 
-Ao final, gere o conteúdo completo de `.ai/architecture.md`, organizado e
+Ao final, gere o conteúdo completo de `.ai/architecture.md` (e de cada
+`.ai/architecture-<projeto>.md`, se a raiz tiver vários projetos), organizado e
 detalhado o suficiente para que qualquer IA consiga, no futuro, planejar e
 implementar uma feature respeitando a arquitetura real do projeto.
 
@@ -81,13 +95,26 @@ Antes de qualquer código, vamos criar e revisar os arquivos:
 2. plan.md
 3. tasks.md
 
-Você deve respeitar os arquivos existentes:
+Você deve ler e respeitar os arquivos obrigatórios:
 
-- ai-instructions.md
-- architecture.md
+- .ai/ai-instructions.md
+- .ai/architecture.md
+- .ai/infraestrutura-testes.md
 
 Fluxo obrigatório:
 
+0. crie a pasta da feature com o próximo número da sequência: veja o
+   maior número usado em .ai/specs/ e em .ai/specs/concluidos/ e use o
+   seguinte, com 3 dígitos (ex.: último 007-... → 008-nome-da-feature).
+   Copie .ai/specs/template/ para .ai/specs/NNN-nome-da-feature/ — todos
+   os arquivos desta feature (inclusive o build-logs.md) ficam ali;
+0.1. usando o mapa do .ai/architecture.md, defina quais projetos a feature
+   altera e preencha PRIMEIRO a tabela "Projetos e arquiteturas
+   envolvidos" da spec.md (pasta do projeto + caminho do
+   .ai/architecture-<projeto>.md + o que muda). Leia somente essas
+   arquiteturas — não as de outros projetos. A mesma tabela deve aparecer
+   no plan.md (com a ordem entre os projetos) e virar um item "Ler ..." por
+   arquivo na seção "Preparação" do tasks.md;
 1. primeiro me ajude a criar a spec.md;
 2. depois revise criticamente a spec;
 3. depois crie o plan.md;
@@ -116,14 +143,17 @@ INSTRUCTIONS.md deste projeto.
 Antes de qualquer linha de código, você deve ler — nesta ordem exata — os
 seguintes arquivos:
 
-1. @ai-instructions.md         
-2. @architecture.md             
-3. @spec.md                     
-4. @plan.md                   
-5. @tasks.md                   
-6. @build-logs.md              
-7. @tests.md
-8. @review.md
+1. @.ai/ai-instructions.md
+2. @.ai/architecture.md
+3. @.ai/infraestrutura-testes.md
+4. @.ai/specs/[NNN-nome-da-feature]/spec.md
+5. os .ai/architecture-<projeto>.md listados na tabela "Projetos e
+   arquiteturas envolvidos" da spec.md — SOMENTE esses
+6. @.ai/specs/[NNN-nome-da-feature]/plan.md
+7. @.ai/specs/[NNN-nome-da-feature]/tasks.md
+8. @.ai/specs/[NNN-nome-da-feature]/build-logs.md
+9. @.ai/specs/[NNN-nome-da-feature]/tests.md
+10. @.ai/specs/[NNN-nome-da-feature]/review.md
 
 Esses arquivos são a fonte de verdade do projeto. Você não deve implementar
 nada que não esteja amparado por eles.
@@ -132,6 +162,8 @@ nada que não esteja amparado por eles.
 
 - ai-instructions.md define como você deve se comportar.
 - architecture.md define os limites técnicos do sistema.
+- infraestrutura-testes.md define como o ambiente local de testes realmente
+  funciona (portas, containers, limitações conhecidas).
 - spec.md define o que precisa existir (comportamento, regras, aceite).
 - plan.md define como construir tecnicamente.
 - tasks.md define a ordem de execução.
@@ -164,7 +196,7 @@ nada que não esteja amparado por eles.
 8. Toda decisão técnica relevante tomada durante a implementação — escolha
    entre abordagens, desvio do plano, preenchimento de lacuna da spec,
    introdução de dependência nova — deve ser registrada no build-logs.md
-   no momento em que é tomada, com: decisão, motivo, alternativas
+   da feature no momento em que é tomada, com: decisão, motivo, alternativas
    descartadas, impacto e se houve divergência em relação ao plan.md/spec.md.
 9. Ao concluir cada bloco de implementação, explique brevemente o que foi
    feito antes de seguir para o próximo.
@@ -201,14 +233,14 @@ Use quando a implementação já começou e você só quer retomar o trabalho se
 Continue a implementação desta feature seguindo Spec Driven Development.
 
 Releia rapidamente:
-1. tasks.md      → [caminho]
-2. build-logs.md → [caminho] (para retomar de onde as decisões anteriores pararam)
+1. .ai/specs/[NNN-nome-da-feature]/tasks.md
+2. .ai/specs/[NNN-nome-da-feature]/build-logs.md (para retomar de onde as decisões anteriores pararam)
 
 Confirme qual é a próxima tarefa pendente no tasks.md e continue a partir
 dela, respeitando spec.md, plan.md e architecture.md.
 
 Regras:
-- registre toda nova decisão relevante no build-logs.md, com o motivo;
+- registre toda nova decisão relevante no build-logs.md da feature, com o motivo;
 - não amplie o escopo sem autorização;
 - ao concluir o bloco, explique brevemente o que foi feito e qual a
   próxima tarefa.
@@ -235,7 +267,7 @@ Verifique:
 Liste o que está concluído, o que ficou pendente e o que precisa de atenção.
 
 Registre o resultado desta revisão em `review.md`, dentro da pasta da
-feature (`.ai/specs/[nome-da-feature]/review.md`). Se o arquivo ainda não
+feature (`.ai/specs/[NNN-nome-da-feature]/review.md`). Se o arquivo ainda não
 existir, crie-o. Cada execução desta validação deve gerar uma nova entrada
 em `review.md`, com data e o que foi revisado — não sobrescreva entradas
 anteriores. Cada entrada deve conter:
@@ -259,5 +291,6 @@ Atualize a documentação da feature com base no que foi realmente implementado.
 
 Verifique se spec.md, plan.md e tasks.md continuam coerentes com o código final.
 
-Se algo mudou durante o desenvolvimento, registre a decisão e explique o motivo.
+Se algo mudou durante o desenvolvimento, registre a decisão no build-logs.md da
+feature e explique o motivo.
 ```

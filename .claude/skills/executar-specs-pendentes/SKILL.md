@@ -21,9 +21,14 @@ nesta rodada, qualquer que tenha sido o resultado).
 
 1. **Calcular a fila:** rode
    `bash .claude/skills/executar-specs-pendentes/scripts/fila.sh .ai/specs`
-   a partir da raiz do projeto. A saída já vem ordenada (menor `spec.md`
-   primeiro, empate por ordem alfabética). Recalcule a cada iteração — a
-   lista muda conforme pastas são movidas.
+   a partir da raiz do projeto. A saída (`<numero><TAB><pasta>`) já vem na
+   ordem de execução: pelo prefixo numérico da pasta (`001-...`, `002-...`,
+   comparação numérica), empate por ordem alfabética — a mesma regra de
+   numeração de `.ai/README.md` (seção 3.1). Nunca reordene a fila por outro
+   critério. Pastas com `spec.md` mas sem prefixo numérico não entram na
+   fila; o script as avisa em stderr (`ignorada (sem numeração): <pasta>`) —
+   guarde esses nomes para o relatório final e não as renomeie você mesma.
+   Recalcule a cada iteração — a lista muda conforme pastas são movidas.
 2. **Uma tentativa por rodada:** remova da fila as specs em `tentadas` —
    cada spec tem no máximo **uma** tentativa por rodada; retentativa só numa
    próxima rodada disparada manualmente pelo desenvolvedor.
@@ -50,7 +55,7 @@ nesta rodada, qualquer que tenha sido o resultado).
      pendências", não "reprovada"): mova a pasta com
      `mv .ai/specs/<spec> .ai/specs/concluidos/<spec>`.
    - Caso contrário: deixe a pasta onde está; confirme que o motivo está
-     registrado em `review.md`/`.ai/build-logs.md` e siga em frente — nunca
+     registrado em `review.md`/`build-logs.md` da spec e siga em frente — nunca
      fique parado numa spec.
 7. Adicione a spec a `tentadas` e volte ao passo 1.
 
@@ -106,8 +111,16 @@ digitar "continue"**: retome sozinha.
   manuais do desenvolvedor, mesmo em modo autônomo.
 - Commits só nas branches criadas pelo executor (`feat/<slug>` /
   `fix/<slug>`), nunca na branch padrão.
-- Nunca edite `ai-instructions.md`, `architecture*.md`, `README.md`,
-  `INSTRUCTIONS.md` ou `prompts.md` do framework (fora de escopo da spec).
+- **NENHUM `Co-Authored-By:`. NENHUMA IA pode ser listada como
+  `Co-Authored-By:`** nos commits da rodada, nem "Generated with ...",
+  "🤖" ou nome de modelo. Depois de cada executor, confira com
+  `git log <branch-padrão>..<branch> --format=%B | grep -i "co-authored-by\|generated with"`
+  em cada repositório; se aparecer algo, registre como violação no
+  relatório final para o desenvolvedor corrigir antes do push.
+- Nunca edite `AGENTS.md`, `CLAUDE.md`, `ai-instructions.md`,
+  `architecture*.md`, `README.md`, `INSTRUCTIONS.md`, `prompts.md` ou
+  `specs/template/` do framework (fora de escopo da spec), e nunca renomeie
+  nem renumere pastas de spec — a numeração é do desenvolvedor.
 - Não pause para pedir aprovação entre specs — o desenvolvedor revisa o
   resultado acumulado no final.
 
@@ -115,12 +128,17 @@ digitar "continue"**: retome sozinha.
 
 Ao esgotar a fila, apresente ao desenvolvedor:
 
-- **Aprovadas e movidas para `concluidos/`:** spec → repositório(s)/branch(es)
-  do commit.
+- **Aprovadas e movidas para `concluidos/`:** spec (com número) →
+  projetos envolvidos → repositório(s)/branch(es) do commit. Como as
+  mensagens de commit não citam a spec, este relatório é o registro da
+  ligação spec → branch.
 - **Não aprovadas (permanecem pendentes):** spec → conclusão do review e
   motivo resumido.
 - **Alertas de área sensível:** specs com entrada `⚠️ ÁREA SENSÍVEL:`
-  no `.ai/build-logs.md`, para revisão redobrada.
+  no próprio `build-logs.md` (procure em `.ai/specs/*/build-logs.md` e
+  `.ai/specs/concluidos/*/build-logs.md`), para revisão redobrada.
+- **Ignoradas por falta de numeração:** pastas avisadas pelo `fila.sh`, com
+  a sugestão de renomeá-las para `NNN-<nome>` seguindo a sequência.
 - **Interrupções e retomadas:** quantas ocorreram, por qual motivo (limite
   mensal / limite de sessão / conexão) e quanto tempo de espera acumularam.
 - Lembrete: nenhuma branch recebeu push — revisar e enviar manualmente.

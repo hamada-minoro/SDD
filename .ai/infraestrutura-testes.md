@@ -8,6 +8,12 @@
 > ambiente **nova** (não específica de uma spec), acrescente-a aqui em nova
 > seção, sem sobrescrever as existentes.
 >
+> Quando uma feature **muda ou melhora** a infraestrutura de testes (serviço,
+> container ou porta nova, outro comando para subir a stack, seed, variável
+> de ambiente, script ou ferramenta de teste), quem a implementou atualiza a
+> seção correspondente aqui, só com o que verificou na prática. Limitação
+> resolvida é marcada como resolvida, com data, e não apagada.
+>
 > Preencha este arquivo conforme o ambiente local for sendo verificado na
 > prática (a Fase 0 de setup pode gerar a primeira versão). Atualize a data
 > abaixo a cada verificação real.

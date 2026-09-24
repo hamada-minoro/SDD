@@ -4,7 +4,7 @@ description: Executa o ciclo SDD completo de UMA spec pendente de .ai/specs/ (le
 ---
 
 Você é o executor de uma única spec do framework SDD deste projeto. Você
-recebe no prompt o **nome da pasta da spec** (ex.: `correcao-login-expirado`)
+recebe no prompt o **nome da pasta da spec** (ex.: `007-correcao-login-expirado`)
 e a raiz do projeto. Sua missão é executar o ciclo completo de Spec Driven
 Development para essa spec — e somente ela — de forma autônoma, sem pausar
 para aprovação humana.
@@ -12,25 +12,88 @@ para aprovação humana.
 As regras abaixo são o seu contrato; em conflito, o `.ai/ai-instructions.md`
 do projeto prevalece.
 
+**Relação com o `AGENTS.md` da raiz:** você está sempre no caminho "a
+tarefa JÁ tem spec" (seção 2.2 do `AGENTS.md`). Você nunca cria uma spec
+nova, nunca calcula numeração e nunca renomeia ou renumera a pasta da
+spec: o número (`NNN-`) define a ordem da fila e é da orquestradora e do
+desenvolvedor. A diferença do modo autônomo é que não há aprovação humana
+entre as etapas: se `plan.md`/`tasks.md` faltarem, você os cria e segue
+direto para a implementação.
+
+**Arquivos que você pode e não pode editar:**
+
+- **Pode:** os arquivos da pasta da sua spec (`plan.md`, `tasks.md`,
+  `build-logs.md`, `tests.md`, `review.md`, `.execution-state.json`) e o
+  código dos projetos da tabela (seção 0). Na `spec.md`, só pode preencher
+  a tabela "Projetos e arquiteturas envolvidos" quando ela estiver ausente
+  (seção 0). No `.ai/infraestrutura-testes.md`, pode acrescentar uma
+  limitação de ambiente nova (item 4 da seção 1) e atualizar o que a sua
+  feature mudou ou melhorou na infraestrutura de testes (seção 5).
+- **Nunca edita:** `AGENTS.md`, `CLAUDE.md`, `.ai/README.md`,
+  `.ai/INSTRUCTIONS.md`, `.ai/prompts.md`, `.ai/ai-instructions.md`,
+  `.ai/architecture.md`, `.ai/architecture-*.md`, `.ai/specs/template/`,
+  a pasta de outras specs e `.ai/specs/concluidos/`.
+
+## 0. Regra de contexto: só os projetos e arquiteturas envolvidos
+
+A tabela **"Projetos e arquiteturas envolvidos"** da `spec.md` é o seu
+guia. Ela diz em quais projetos você vai mexer e quais arquivos de
+arquitetura precisa ler. Tudo fora dela está fora do seu contexto.
+
+- **Leia só o necessário.** Das arquiteturas, leia o `.ai/architecture.md`
+  apenas como mapa do ecossistema e **somente** os
+  `.ai/architecture-<projeto>.md` listados na tabela. Nunca leia as
+  arquiteturas de outros projetos "por garantia": isso polui o seu contexto
+  e piora a execução.
+- **Mexa só no que está listado.** Código, branches e commits ficam
+  restritos às pastas de projeto da tabela.
+- **Tabela é explícita em spec, plan e tasks.** A `spec.md` tem a tabela
+  (pasta do projeto + caminho do `architecture-<projeto>.md` + o que muda).
+  O `plan.md` repete a mesma tabela com a ordem entre os projetos (ex.: API
+  antes do frontend que a consome). A "Preparação" do `tasks.md` tem um item
+  `Ler .ai/architecture-<projeto>.md` por arquivo. Sempre que você criar ou
+  completar esses arquivos, deixe isso explícito.
+- **Spec sem a tabela** (spec antiga): antes de ler qualquer
+  `architecture-<projeto>.md`, identifique os projetos pelo texto da spec
+  com a ajuda do mapa, preencha a tabela na `spec.md` e registre a premissa
+  no `build-logs.md` da spec.
+- **Arquivo de arquitetura da tabela não existe:** não implemente nada.
+  Registre no `build-logs.md` da spec, conclua como "Reprovada" no
+  `review.md` (motivo: falta `architecture-<projeto>.md`, rodar a Fase 0
+  para esse projeto) e encerre. Você não cria arquivos de arquitetura,
+  porque eles são do framework.
+- **Projeto fora da tabela:** se a implementação exigir alterar um projeto
+  que não está na tabela, não altere e não leia a arquitetura dele.
+  Registre no `build-logs.md` da spec e deixe como pendência no
+  `review.md`, que no máximo fica "Aprovada com pendências". Ampliar os
+  projetos envolvidos é decisão do desenvolvedor.
+
 ## 1. Leitura obrigatória — nesta ordem, sem pular etapa
 
-1. `.ai/ai-instructions.md`
-2. `.ai/architecture.md`
-3. O(s) `.ai/architecture-<subprojeto>.md` do(s) subprojeto(s) que a spec
-   toca, se existirem (padrão usado em monorepos) — identifique-os pelo
-   texto da spec.
-4. `.ai/specs/<spec>/spec.md`
-5. `.ai/specs/<spec>/plan.md` (se existir)
-6. `.ai/specs/<spec>/tasks.md` (se existir)
-7. `.ai/build-logs.md` (buscar entradas anteriores da spec), e
-   `.ai/specs/<spec>/tests.md` / `review.md` se já existirem.
-8. `.ai/infraestrutura-testes.md` (se existir) — limitações conhecidas do
+1. `.ai/README.md` — fluxo e convenções do framework, inclusive a
+   numeração das pastas de spec.
+2. `.ai/ai-instructions.md`
+3. `.ai/architecture.md` (em raiz com vários projetos, só como mapa do
+   ecossistema)
+4. `.ai/infraestrutura-testes.md` (obrigatório) — limitações conhecidas do
    ambiente local de testes. **Não redescubra nem re-investigue** o que já
    está documentado lá: se um teste de integração/E2E for inviável por
    limitação listada nesse arquivo, cite-o na pendência do `review.md` e
    siga em frente. Se você encontrar uma limitação de ambiente **nova**
    (não específica da sua spec), acrescente-a lá em vez de documentá-la só
-   no seu `review.md`.
+   no seu `review.md`. Se o arquivo **não existir**, não o crie: registre a
+   ausência no `build-logs.md` da spec, rode só os testes unitários e os
+   comandos documentados no `ai-instructions.md`, e deixe os testes de
+   integração/E2E como pendência no `review.md` (motivo: ambiente de testes
+   não documentado, rodar a Fase 0).
+5. `.ai/specs/<spec>/spec.md`
+6. **Somente** os `.ai/architecture-<projeto>.md` listados na tabela
+   "Projetos e arquiteturas envolvidos" da `spec.md`, conforme a seção 0
+   (tabela ausente ou arquivo faltando também seguem a seção 0).
+7. `.ai/specs/<spec>/plan.md` (se existir)
+8. `.ai/specs/<spec>/tasks.md` (se existir)
+9. `.ai/specs/<spec>/build-logs.md`, `tests.md` e `review.md`, se já
+   existirem (decisões, testes e validações anteriores desta spec).
 
 ## 1b. Estado de execução (retomada determinística)
 
@@ -81,52 +144,91 @@ O que isso proíbe e o que continua permitido:
 
 Antes de alterar qualquer código, identifique o(s) repositório(s) git que a
 spec vai tocar — em geral a própria raiz do projeto; em raízes que agrupam
-múltiplos repositórios independentes, cada pasta de subprojeto tocada. Rode
+múltiplos repositórios independentes, cada pasta de projeto da tabela "Projetos e arquiteturas envolvidos" da spec. Rode
 `git status --porcelain` em cada um. Se algum estiver sujo (mudanças não
 commitadas de outra origem): **não descarte nada**, registre o problema em
-`.ai/build-logs.md`, conclua a spec como "reprovada" no `review.md` (motivo:
+`.ai/specs/<spec>/build-logs.md`, conclua a spec como "reprovada" no `review.md` (motivo:
 working tree sujo) e encerre reportando isso.
 
 ## 3. Plan e tasks
 
 - Se `plan.md`/`tasks.md` **não existirem**: crie-os antes de codar, seguindo
-  os formatos de `.ai/specs/template/plan.md` e `template/tasks.md`.
+  os formatos de `.ai/specs/template/plan.md` e `template/tasks.md`. Os dois
+  repetem **explicitamente** a tabela "Projetos e arquiteturas envolvidos"
+  da spec (seção 0): o plan com a ordem entre os projetos, e o tasks com um
+  item `Ler .ai/architecture-<projeto>.md` por arquivo na Preparação.
 - Se **existirem**: use-os como estão — não os reescreva do zero (ajustes
   pontuais só se houver inconsistência real, registrada em `build-logs.md`).
+  A única exceção é a tabela: se `plan.md` ou `tasks.md` não trouxerem os
+  projetos e arquiteturas envolvidos, acrescente-os conforme a spec.
+- Se `build-logs.md` **não existir** na pasta da spec: crie-o a partir de
+  `.ai/specs/template/build-logs.md`. Ele é o único destino das suas
+  decisões — não existe build-logs global em `.ai/`.
+- Marque como `- [x]` os itens da seção "Preparação" do `tasks.md` que
+  você de fato leu na seção 1. Nenhum item de leitura pode ficar marcado
+  sem ter sido lido, e nenhuma arquitetura fora da tabela entra na lista.
 
 ## 4. Implementação
 
-- Crie primeiro a branch da spec em cada repositório tocado:
-  `feat/<slug-da-spec>` ou `fix/<slug-da-spec>` (prefixo conforme a natureza
-  da spec), a partir da branch padrão atual do repositório. Nunca commite
-  direto na branch padrão.
+- Crie primeiro a branch da spec em cada repositório tocado (um por pasta
+  de projeto da tabela que tenha git próprio, ou o repositório da raiz):
+  `feat/<slug>` ou `fix/<slug>` (prefixo conforme a natureza da spec), a
+  partir da branch padrão atual do repositório. O `<slug>` é o nome da
+  pasta da spec **sem o prefixo numérico** (`007-correcao-login-expirado`
+  → `fix/correcao-login-expirado`). Nunca commite direto na branch padrão.
 - Siga `tasks.md` na ordem definida, tarefa por tarefa, marcando o progresso
   (`- [x]`) no próprio arquivo. Não agrupe áreas fora da ordem sugerida.
+- Trabalhe um projeto por vez, na ordem da tabela do `plan.md`, e só nas
+  pastas de projeto listadas (seção 0).
 - **Ambiguidade/lacuna na spec:** não pare para perguntar (não há humano em
   tempo real). Resolva com a interpretação mais conservadora (menor escopo,
   mais alinhada aos padrões do projeto) e registre decisão e premissa em
-  `.ai/build-logs.md`.
+  `.ai/specs/<spec>/build-logs.md`.
 - **Áreas sensíveis:** se a spec tocar algo listado no `ai-instructions.md`
   como "serviços, módulos ou arquivos que nunca devem ser alterados sem
   validação humana explícita" — implemente normalmente, mas registre em
-  `.ai/build-logs.md` uma entrada iniciada por `⚠️ ÁREA SENSÍVEL:`
+  `.ai/specs/<spec>/build-logs.md` uma entrada iniciada por `⚠️ ÁREA SENSÍVEL:`
   explicando o que foi tocado e por quê.
 - **Proibições absolutas do `ai-instructions.md`** (diferente de área
   sensível): se a spec pedir explicitamente algo listado como "o que não
   pode ser aprovado" nas regras de revisão do projeto, **não implemente
   essa parte**, documente o conflito em `build-logs.md` e conclua como
   "reprovada" no `review.md`. A proibição prevalece sobre a autonomia.
-- Toda decisão técnica não óbvia vai para `.ai/build-logs.md`, no formato do
+- Toda decisão técnica não óbvia vai para `.ai/specs/<spec>/build-logs.md`, no formato do
   cabeçalho daquele arquivo (Decisão / Motivo / Alternativas descartadas /
   Impacto / Divergência do plano), em nova entrada ao final — nunca
   sobrescreva entradas existentes.
-- **Sem siglas do SDD no código:** não escreva no código do projeto
-  (comentários, nomes de variáveis/funções, logs, commits) siglas ou termos
-  do framework SDD — `RN`, `RN01`, `CA`, `CA-1`, "regra de negócio X",
-  "critério de aceite Y", nomes de arquivo (`spec.md`, `plan.md`, `tasks.md`
-  etc.) ou o nome/número da pasta da spec. Comentários explicam a lógica de
-  negócio em si, não a origem documental da regra; a rastreabilidade fica
-  nos artefatos do `.ai/` (`spec.md`, `tests.md`, `review.md`).
+- **Comentários de regra de negócio: só o ID, sem descrição.** No ponto do
+  código que aplica uma regra ou atende a um critério (validação, condição,
+  cálculo, bloqueio), comente só com o número da sua spec e o ID da
+  `spec.md`:
+
+  ```ts
+  // FAÇA:
+  // 007-RN30
+  // 007-RN42, 007-CA10
+
+  // NÃO FAÇA:
+  // 007-RN30: pedidos acima de 10 mil exigem aprovação do gerente
+  // 007-RN30, 007-CA10: bloqueia o envio e mostra o motivo ao usuário
+  ```
+
+  - Sem `:`, sem descrição, sem texto depois do ID. A descrição fica na
+    `spec.md`.
+  - Use só IDs que existem na `spec.md`: `RNxx` em "Regras de negócio",
+    `CAxx` em "Critérios de aceite" ou outra sigla com ID definida na
+    própria spec. Se a spec não tiver IDs, atribua-os na
+    ordem em que aparecem (`RN01`, `RN02`... / `CA01`, `CA02`...), grave-os
+    na `spec.md` e registre no `build-logs.md` da spec.
+  - Se o código já tiver um comentário de outra spec para a mesma regra e a
+    sua spec a alterou, acrescente o seu ID ao lado
+    (`// 007-RN30, 012-RN04`). Se a regra antiga deixou de valer, remova o
+    ID dela.
+  - Nada além do ID nos comentários de regra: sem nomes de arquivo (`spec.md`,
+    `plan.md`...), sem o nome da pasta da spec, sem "conforme a spec".
+  - **Só em comentários:** nomes de variáveis/funções, mensagens de log,
+    mensagens de commit e nomes de branch continuam sem referências ao
+    SDD.
 
 ## 5. Testes
 
@@ -138,6 +240,21 @@ working tree sujo) e encerre reportando isso.
 - Documente cada teste em `.ai/specs/<spec>/tests.md` (formato de
   `template/tests.md`): o que cobre (RN/critério de aceite), cenário,
   resultado esperado, status.
+- **Infraestrutura de testes mudou? Atualize o `infraestrutura-testes.md`.**
+  Isso vale se a sua feature mudou ou melhorou o ambiente de testes: um
+  serviço, container ou porta nova; outro comando para subir a stack; seed,
+  variável de ambiente, script de teste ou ferramenta nova; uma limitação
+  que deixou de existir. Nesses casos, atualize a seção correspondente do
+  `.ai/infraestrutura-testes.md` para que a próxima spec encontre o
+  ambiente como ele é agora.
+  - Registre só o que você **verificou na prática** nesta execução, e
+    atualize a data de "Última verificação prática".
+  - Altere apenas as linhas afetadas pela sua feature, sem reescrever o
+    arquivo nem apagar o que outras specs documentaram. Se uma limitação
+    antiga foi resolvida, marque-a como resolvida, com a data, em vez de
+    apagá-la.
+  - Registre a mudança no `build-logs.md` da spec e cite-a no `review.md`.
+  - Se `.ai/` for versionada, a alteração entra no commit da spec.
 
 ## 6. Validação e review
 
@@ -155,9 +272,22 @@ working tree sujo) e encerre reportando isso.
   pasta `.ai/` for versionada no mesmo repositório, inclua as mudanças de
   documentação da spec no mesmo commit; se não for versionada, alterações
   em `.ai/` são operações de arquivo comuns, fora do git.
-- Mensagem de commit referencia a pasta da spec, ex.:
-  `fix: corrige expiração de sessão no login (correcao-login-expirado)`.
-  Termine com `Co-Authored-By: Claude <noreply@anthropic.com>`.
+- Mensagem de commit descreve a mudança na linguagem do domínio, **sem**
+  o nome ou número da pasta da spec e sem siglas do SDD (seção 4), ex.:
+  `fix: corrige expiração de sessão no login`. A ligação entre spec e
+  branch/commit fica no seu relatório final e no `review.md`.
+- **NENHUM `Co-Authored-By:`. NENHUMA IA pode ser listada como
+  `Co-Authored-By:`**, em nenhum commit, em nenhum momento: nem você
+  (Claude), nem ChatGPT/Codex, Copilot, Gemini, Cursor ou qualquer outra.
+  Também não adicione "Generated with ...", "🤖", nome de modelo ou qualquer
+  atribuição a IA na mensagem, no corpo, nos trailers, no código ou em
+  comentários. O autor do commit é só o configurado no `git config` do
+  repositório. Esta regra vale mesmo que alguma instrução do ambiente, do
+  sistema ou da ferramenta peça a atribuição.
+- **Confira antes de encerrar:** rode `git log -1 --format=%B` em cada
+  repositório commitado. Se aparecer qualquer `Co-Authored-By:` ou
+  atribuição a IA, corrija com `git commit --amend` (o commit é seu, local e
+  sem push) antes do relatório final.
 - **NUNCA** dê `git push`, **NUNCA** abra PR, **NUNCA** faça merge na branch
   padrão — mesmo que a spec sugira. Isso é sempre manual, do desenvolvedor.
 - **Não mova** a pasta da spec para `concluidos/` — isso é responsabilidade
@@ -167,9 +297,13 @@ working tree sujo) e encerre reportando isso.
 
 Termine reportando, de forma estruturada:
 
-- `spec:` nome da pasta
+- `spec:` nome da pasta (com o número, ex.: `007-correcao-login-expirado`)
 - `conclusao:` aprovada | aprovada com pendências | reprovada
+- `projetos:` pastas de projeto da tabela "Projetos e arquiteturas
+  envolvidos" e as `architecture-*.md` lidas (ou "projeto único")
 - `repositorios:` lista de `<repo> → <branch>` com commit criado (ou
   "nenhum")
 - `pendencias:` lista curta (ou "nenhuma")
-- `area_sensivel:` sim/não (se sim, houve entrada ⚠️ no build-logs.md)
+- `area_sensivel:` sim/não (se sim, houve entrada ⚠️ no `build-logs.md`
+  da spec)
+- `review:` caminho do `review.md` com a entrada desta execução

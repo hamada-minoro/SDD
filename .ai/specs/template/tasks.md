@@ -2,10 +2,15 @@
 
 ## Preparação
 
-- [ ] Confirmar leitura de ai-instructions.md
-- [ ] Confirmar leitura de architecture.md
-- [ ] Confirmar leitura de spec.md
-- [ ] Confirmar leitura de plan.md
+> Leia **somente** os arquivos desta lista. As arquiteturas de projeto são as da tabela "Projetos e arquiteturas envolvidos" da `spec.md`: escreva um item por arquivo, com o caminho real. Não leia `architecture-*.md` de projetos que não estão aqui.
+
+- [ ] Ler .ai/ai-instructions.md
+- [ ] Ler .ai/architecture.md (mapa do ecossistema)
+- [ ] Ler .ai/infraestrutura-testes.md
+- [ ] Ler spec.md
+- [ ] Ler .ai/architecture-pasta-do-projeto.md
+- [ ] Ler plan.md
+- [ ] Confirmar leitura do build-logs.md desta feature (decisões anteriores)
 
 ## Banco de dados
 
@@ -47,4 +52,4 @@
 - [ ] Atualizar spec.md, se necessário
 - [ ] Atualizar plan.md, se necessário
 - [ ] Atualizar README/API/CHANGELOG, se necessário
-- [ ] Confirmar que toda decisão relevante está registrada no build-logs.md
+- [ ] Confirmar que toda decisão relevante está registrada no build-logs.md desta feature

@@ -26,7 +26,7 @@ A IA não deve começar codando. Ela deve primeiro entender:
 
 Somente depois disso a IA pode iniciar a implementação.
 
-O fluxo base deste projeto usa oito arquivos principais:
+O fluxo base deste projeto usa oito arquivos principais. Os dois primeiros são globais do projeto (ficam na raiz de `.ai/`); os outros seis são **por feature** e ficam na pasta da spec (`.ai/specs/NNN-nome-da-feature/`):
 
 ```txt
 ai-instructions.md
@@ -69,27 +69,31 @@ A estrutura é organizada na pasta do projeto dentro de `.ai/`. Basta copiar est
 
 ```txt
 projeto/
+├── AGENTS.md                          # porta de entrada para qualquer agente de IA: manda ler .ai/ antes de tudo
+├── CLAUDE.md                          # só importa o AGENTS.md (@AGENTS.md), para o Claude Code
 ├── .ai/
 │   ├── README.md
 │   ├── INSTRUCTIONS.md
 │   ├── prompts.md
 │   ├── ai-instructions.md
-│   ├── build-logs.md
-│   ├── architecture.md
-│   ├── architecture-<subprojeto>.md   # opcional — um por subprojeto, em monorepos
+│   ├── architecture.md                # visão geral; em raiz multiprojeto, o mapa do ecossistema
+│   ├── architecture-<projeto>.md      # obrigatório em raiz multiprojeto: um por pasta de projeto
 │   ├── infraestrutura-testes.md       # referência verificada do ambiente local de testes
 │   └── specs/
-│       ├── template/                  # modelos dos cinco arquivos de spec — copie para criar uma feature
+│       ├── template/                  # modelos dos arquivos de feature — copie para criar uma feature
 │       │   ├── spec.md
 │       │   ├── plan.md
 │       │   ├── tasks.md
+│       │   ├── build-logs.md
 │       │   ├── tests.md
 │       │   └── review.md
-│       ├── concluidos/                # specs finalizadas e aprovadas são movidas para cá
-│       └── nome-da-feature/           # uma pasta por feature pendente/em andamento
+│       ├── concluidos/                # specs finalizadas e aprovadas são movidas para cá (mantêm o número)
+│       │   └── 001-nome-da-feature/
+│       └── 002-nome-da-feature/       # uma pasta numerada por feature pendente/em andamento
 │           ├── spec.md
 │           ├── plan.md
 │           ├── tasks.md
+│           ├── build-logs.md
 │           ├── tests.md
 │           └── review.md
 ├── .claude/                           # opcional — automação para Claude Code (ver .claude/README.md)
@@ -100,10 +104,57 @@ projeto/
 
 Sobre as peças além do fluxo base:
 
-- **`architecture-<subprojeto>.md`** — quando a raiz é um monorepo (ou agrupa vários projetos), `architecture.md` descreve os conceitos compartilhados do ecossistema e cada subprojeto ganha um arquivo próprio (ex.: `architecture-backend.md`, `architecture-frontend.md`). A IA lê o `architecture.md` geral e depois só o(s) arquivo(s) do(s) subprojeto(s) que a feature toca.
+- **`architecture-<projeto>.md`**: obrigatório quando a raiz agrupa vários projetos (seção 3.2). Existe um arquivo por projeto, com o nome da pasta do projeto (ex.: `architecture-api-pedidos.md`). A IA lê o `architecture.md` geral e depois só os arquivos dos projetos que a feature toca.
 - **`infraestrutura-testes.md`** — memória verificada do ambiente local de testes (portas reais, containers, como subir a stack, limitações conhecidas). Evita que cada sessão de IA redescubra — ou pior, assuma errado — como rodar testes de integração/E2E.
-- **`specs/template/`** — os modelos dos cinco arquivos de spec. Para criar uma feature, copie a pasta e renomeie. A automação também usa esses modelos quando precisa gerar `plan.md`/`tasks.md`.
-- **`specs/concluidos/`** — ciclo de vida das specs: pendente (em `specs/`) → aprovada na validação → movida para `concluidos/`. A fila de pendências é simplesmente o que ainda está em `specs/`.
+- **`AGENTS.md` / `CLAUDE.md`** (na raiz do projeto) — o `AGENTS.md` é lido automaticamente pelos agentes de IA e os obriga a começar por este `README.md`, criar spec/plan/tasks quando a tarefa ainda não tem spec e ler os arquivos obrigatórios quando ela já tem. O `CLAUDE.md` só contém `@AGENTS.md`, para garantir a leitura no Claude Code.
+- **`specs/template/`** — os modelos dos seis arquivos de feature (`spec.md`, `plan.md`, `tasks.md`, `build-logs.md`, `tests.md`, `review.md`). Para criar uma feature, copie a pasta e renomeie seguindo a numeração (seção 3.1). A automação também usa esses modelos quando precisa gerar `plan.md`/`tasks.md`.
+- **`specs/concluidos/`** — ciclo de vida das specs: pendente (em `specs/`) → aprovada na validação → movida para `concluidos/`. A fila de pendências é simplesmente o que ainda está em `specs/`, na ordem numérica.
+
+### 3.1 Numeração das specs
+
+Toda pasta de feature começa com um número sequencial de 3 dígitos: `NNN-nome-da-feature` (ex.: `001-login`, `002-recuperar-senha`). **O número define a ordem de execução**: a fila de pendências é sempre processada do menor número para o maior, seja manualmente, seja pela automação da `.claude/`.
+
+Ao criar uma feature nova:
+
+1. Procure o maior número já usado **nas duas** pastas, `.ai/specs/` e `.ai/specs/concluidos/`:
+
+   ```bash
+   ls -1 .ai/specs .ai/specs/concluidos 2>/dev/null | grep -E '^[0-9]+-' | sed -E 's/^([0-9]+)-.*/\1/' | sort -n | tail -1
+   ```
+
+2. Use o número seguinte, com 3 dígitos (`007` → `008`). Sem nenhuma spec, comece em `001`.
+3. Nunca reutilize um número (nem de spec concluída) e nunca renumere specs existentes. Se uma feature precisar rodar antes de outra já criada, ajuste a dependência na spec em vez de trocar números.
+
+Pastas sem prefixo numérico não entram na fila automática. Renomeie-as seguindo a sequência.
+
+### 3.2 Raiz com vários projetos (microsserviços, APIs e frontends separados)
+
+É comum instalar `.ai/` e `.claude/` numa **pasta raiz que agrupa vários projetos** do mesmo ecossistema: APIs, frontends, workers, lambdas, microsserviços ou projetos complementares, muitas vezes cada um com seu próprio repositório git. Nesse cenário a arquitetura é documentada em dois níveis, e **os dois são obrigatórios**:
+
+```txt
+raiz-do-ecossistema/
+├── AGENTS.md
+├── CLAUDE.md
+├── .ai/
+│   ├── architecture.md                    # mapa do ecossistema
+│   ├── architecture-api-pedidos.md        # um por projeto da raiz
+│   ├── architecture-api-pagamentos.md
+│   ├── architecture-web-admin.md
+│   └── ...
+├── .claude/
+├── api-pedidos/                           # projeto (repositório próprio ou não)
+├── api-pagamentos/
+└── web-admin/
+```
+
+- **`architecture.md` é o mapa do ecossistema.** Traz a tabela de projetos (pasta, tipo, stack, repositório, arquivo de arquitetura), como eles se comunicam (APIs, eventos, filas, banco compartilhado), os contratos entre eles e os conceitos comuns, como autenticação e padrões transversais. Os detalhes internos de cada projeto não ficam aqui.
+- **`architecture-<projeto>.md` descreve um projeto.** Existe **um arquivo para cada projeto da raiz**, e `<projeto>` é **exatamente o nome da pasta** do projeto (`api-pedidos/` → `architecture-api-pedidos.md`). Ele traz stack, estrutura de pastas, padrões, banco, testes e restrições daquele projeto, usando as mesmas seções do modelo `architecture.md`.
+- **Projeto sem arquivo de arquitetura não recebe feature.** Se uma spec toca um projeto que ainda não tem `architecture-<projeto>.md`, gere esse arquivo primeiro (prompt "0. Setup" de `prompts.md`, focado no projeto novo) e inclua o projeto na tabela do `architecture.md`.
+- **Projeto novo na raiz = arquivo novo.** Ao adicionar um projeto à raiz, crie o `architecture-<projeto>.md` dele e atualize o mapa do ecossistema antes da primeira spec que o toque.
+- **A spec diz quais projetos e arquiteturas entram.** A tabela "Projetos e arquiteturas envolvidos" da `spec.md` lista cada projeto que a feature altera e o arquivo de arquitetura dele. O `plan.md` repete essa tabela com a ordem entre os projetos, e a "Preparação" do `tasks.md` lista os arquivos a ler, um por item. Essa tabela também define em quais repositórios a automação cria branches.
+- **Contexto mínimo: a IA lê só o que vai mexer.** Para executar uma feature, a IA lê o `architecture.md` (o mapa) e **apenas** os `architecture-<projeto>.md` da tabela da spec. Nunca lê as arquiteturas de todos os projetos "por garantia": isso polui o contexto e piora a execução. Se durante a execução aparecer a necessidade de mexer num projeto fora da tabela, a IA para, atualiza spec/plan/tasks, registra a decisão no `build-logs.md` da feature e só então lê a arquitetura desse projeto.
+
+Em um projeto único (um só repositório na raiz), basta o `architecture.md`, sem arquivos por projeto.
 - **`.claude/`** — camada opcional de execução autônoma para o Claude Code (ver seção 10 e `.claude/README.md`).
 
 ---
@@ -133,9 +184,9 @@ A IA deve ler este arquivo antes de qualquer tarefa relevante.
 
 ---
 
-### 4.2 `architecture.md`
+### 4.2 `architecture.md` (e `architecture-<projeto>.md`)
 
-Este arquivo descreve a arquitetura do projeto.
+Este arquivo descreve a arquitetura do projeto. Em raiz com vários projetos, ele vira o mapa do ecossistema e cada projeto tem o seu `architecture-<projeto>.md` com o conteúdo abaixo (seção 3.2).
 
 Ele responde à pergunta:
 
@@ -281,7 +332,7 @@ Sem o `review.md`, cada validação fica só na conversa com a IA e se perde —
 
 ### 4.8 `build-logs.md`
 
-Este é o diário de decisões da implementação.
+Este é o diário de decisões da implementação. Cada feature tem o **seu próprio** `build-logs.md`, dentro da pasta da spec (`.ai/specs/NNN-nome-da-feature/build-logs.md`), criado a partir de `specs/template/build-logs.md`. Não existe build-logs global: as decisões de uma feature ficam junto da spec, do plano e dos testes dela e acompanham a pasta quando ela vai para `concluidos/`.
 
 Ele responde à pergunta:
 
@@ -317,16 +368,19 @@ Sem o `build-logs.md`, a IA pode codar livremente e o desenvolvedor perde o porq
 Antes de desenvolver, a IA deve ler os arquivos nesta ordem:
 
 ```txt
+Obrigatórios (globais, sempre):
 1. ai-instructions.md
-2. architecture.md
-2.1. architecture-<subprojeto>.md (se existirem, apenas os dos subprojetos que a feature toca)
-3. spec.md
-4. plan.md
-5. tasks.md
-6. build-logs.md (se já existir, para entender decisões anteriores)
-7. tests.md (se já existir, para não duplicar testes já escritos)
-8. review.md (se já existir, para saber o que já foi validado antes)
-9. infraestrutura-testes.md (se existir, antes de rodar testes de integração/E2E)
+2. architecture.md (em raiz multiprojeto: só o mapa do ecossistema)
+3. infraestrutura-testes.md
+
+Da feature (pasta .ai/specs/NNN-nome-da-feature/):
+4. spec.md (a tabela "Projetos e arquiteturas envolvidos" diz o que ler no passo 5)
+5. architecture-<projeto>.md: SOMENTE os listados na tabela da spec, nenhum outro
+6. plan.md
+7. tasks.md
+8. build-logs.md (decisões anteriores desta feature)
+9. tests.md (testes já escritos para esta feature)
+10. review.md (validações anteriores desta feature)
 ```
 
 A ordem importa.
@@ -334,13 +388,17 @@ A ordem importa.
 Motivo:
 
 1. `ai-instructions.md` define como a IA deve trabalhar.
-2. `architecture.md` define os limites técnicos do projeto.
-3. `spec.md` define o que precisa ser construído.
-4. `plan.md` define como construir.
-5. `tasks.md` define a ordem de execução.
-6. `build-logs.md` mostra o que já foi decidido antes, evitando que a IA repita discussões ou contradiga decisões já tomadas.
-7. `tests.md` mostra o que já foi testado, evitando testes duplicados e mostrando lacunas de cobertura.
-8. `review.md` mostra o que já foi validado contra a spec antes, evitando repetir uma revisão do zero.
+2. `architecture.md` define os limites técnicos do projeto ou, em raiz multiprojeto, o mapa do ecossistema.
+3. `infraestrutura-testes.md` define como o ambiente de testes realmente funciona, para que a IA não assuma portas, containers ou comandos errados.
+4. `spec.md` define o que precisa ser construído e quais projetos e arquiteturas estão envolvidos.
+5. Cada `architecture-<projeto>.md` listado define os limites do projeto que será alterado. Ler só esses mantém o contexto enxuto.
+6. `plan.md` define como construir.
+7. `tasks.md` define a ordem de execução.
+8. `build-logs.md` mostra o que já foi decidido antes nesta feature, evitando que a IA repita discussões ou contradiga decisões já tomadas.
+9. `tests.md` mostra o que já foi testado, evitando testes duplicados e mostrando lacunas de cobertura.
+10. `review.md` mostra o que já foi validado contra a spec antes, evitando repetir uma revisão do zero.
+
+Se a tarefa ainda não tem spec, a IA lê os três obrigatórios, usa o mapa do `architecture.md` para decidir quais projetos a feature toca e cria a pasta numerada da feature (seção 3.1). A **primeira** coisa que preenche na `spec.md` é a tabela "Projetos e arquiteturas envolvidos". Depois lê só as arquiteturas dessa tabela para escrever `plan.md` e `tasks.md`, que repetem a mesma lista. Nenhum código é escrito antes disso. Essa regra também está no `AGENTS.md` da raiz do projeto.
 
 A IA não deve iniciar implementação se não tiver lido os arquivos necessários.
 
@@ -354,6 +412,8 @@ O fluxo ideal é:
 Setup do projeto (analisar arquitetura real e gerar architecture.md)
         ↓
 Ideia ou necessidade
+        ↓
+Criar a pasta .ai/specs/NNN-nome-da-feature/ (próximo número da sequência)
         ↓
 Criar ou atualizar spec.md
         ↓
@@ -377,7 +437,7 @@ IA lê tasks.md
         ↓
 IA implementa tarefa por tarefa
         ↓
-IA registra decisões relevantes no build-logs.md
+IA registra decisões relevantes no build-logs.md da feature
         ↓
 IA escreve testes e documenta em tests.md
         ↓
@@ -452,8 +512,8 @@ A IA só deve codar depois que esses níveis estiverem claros, e deve manter o `
 
 Quando o projeto acumula várias specs prontas em `.ai/specs/`, é possível executá-las em lote com a camada de automação da pasta `.claude/` (Claude Code):
 
-- a skill **`/executar-specs-pendentes`** orquestra a fila: calcula a ordem (specs menores primeiro), dispara um subagente por spec e, ao final de cada uma, confere o `review.md` — só move para `concluidos/` o que foi **"Aprovada"** sem ressalvas;
-- o subagente **`executor-spec-sdd`** executa o ciclo SDD completo de uma única spec, em contexto zerado (sem memória das specs anteriores): leitura obrigatória na ordem da seção 5, `plan.md`/`tasks.md` a partir de `specs/template/` quando faltam, implementação tarefa por tarefa, testes, `review.md` e commit em branch própria (`feat/<slug>` ou `fix/<slug>`);
+- a skill **`/executar-specs-pendentes`** orquestra a fila: calcula a ordem pela numeração das pastas (`001`, `002`, … — seção 3.1), dispara um subagente por spec e, ao final de cada uma, confere o `review.md` — só move para `concluidos/` o que foi **"Aprovada"** sem ressalvas;
+- o subagente **`executor-spec-sdd`** executa o ciclo SDD completo de uma única spec, em contexto zerado (sem memória das specs anteriores): leitura obrigatória na ordem da seção 5, decisões no `build-logs.md` da própria spec, `plan.md`/`tasks.md` a partir de `specs/template/` quando faltam, implementação tarefa por tarefa, testes, `review.md` e commit em branch própria (`feat/<slug>` ou `fix/<slug>`);
 - guarda-corpos fixos: nunca `git push`, nunca PR, nunca commit na branch padrão, nunca editar os arquivos do framework, e as proibições do `ai-instructions.md` prevalecem sobre a autonomia.
 
 O modo autônomo não substitui o fluxo das seções anteriores — ele o executa. A qualidade do resultado continua dependendo de specs bem escritas e de `architecture.md`/`ai-instructions.md` fiéis ao projeto (Fase 0). Detalhes de uso e revisão pós-rodada em `.claude/README.md`.

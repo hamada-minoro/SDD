@@ -4,7 +4,8 @@ Framework pronto para guiar o desenvolvimento de software com IA a partir de doc
 
 ## O que existe aqui
 
-- **[`.ai/`](.ai/README.md)** — o framework em si: arquivos de contexto (`README.md`, `INSTRUCTIONS.md`, `prompts.md`, `ai-instructions.md`, `architecture.md`, `build-logs.md`, `infraestrutura-testes.md`) e o ciclo de specs por feature (`spec.md`, `plan.md`, `tasks.md`, `tests.md`, `review.md`), com templates prontos em `specs/template/` e ciclo de vida pendente → `specs/concluidos/`.
+- **[`.ai/`](.ai/README.md)** — o framework em si: arquivos de contexto (`README.md`, `INSTRUCTIONS.md`, `prompts.md`, `ai-instructions.md`, `architecture.md`, `infraestrutura-testes.md`) e o ciclo de specs por feature (`spec.md`, `plan.md`, `tasks.md`, `build-logs.md`, `tests.md`, `review.md`), em pastas numeradas (`001-...`, `002-...`) que definem a ordem de execução, com templates prontos em `specs/template/` e ciclo de vida pendente → `specs/concluidos/`.
+- **[`AGENTS.md`](AGENTS.md)** — porta de entrada para qualquer agente de IA: obriga a ler `.ai/README.md` antes de qualquer tarefa, criar spec/plan/tasks quando a tarefa ainda não tem spec e ler os arquivos obrigatórios (`ai-instructions.md`, `architecture.md`, `infraestrutura-testes.md`) quando já tem. O [`CLAUDE.md`](CLAUDE.md) só importa o `AGENTS.md`, para o Claude Code.
 - **[`.claude/`](.claude/README.md)** — camada opcional de automação para o Claude Code: a skill `/executar-specs-pendentes` (orquestradora da fila) e o subagente `executor-spec-sdd`, que executa o ciclo SDD completo de uma spec por vez, em contexto zerado, commitando em branch própria — sem nunca dar push nem abrir PR.
 
 ## Por que existe
@@ -15,17 +16,17 @@ O fluxo da `.ai/` obriga a IA a entender o contexto, ler a spec, seguir um plano
 
 ## O que agrega ao desenvolvimento
 
-- **Contexto consistente**: a IA sempre lê arquitetura, regras de negócio e decisões anteriores antes de implementar — inclusive as arquiteturas por subprojeto (`architecture-<subprojeto>.md`) em monorepos.
-- **Rastreabilidade**: o `build-logs.md` registra o porquê de cada decisão técnica, o `tests.md` documenta o que foi testado e o `review.md` guarda o histórico de validações contra a spec — mesmo sem acompanhar a implementação em tempo real.
+- **Contexto consistente**: a IA sempre lê arquitetura, regras de negócio e decisões anteriores antes de implementar — inclusive, quando a raiz agrupa vários projetos (APIs, frontends, microsserviços), o mapa do ecossistema em `architecture.md` e um `architecture-<projeto>.md` obrigatório para cada projeto.
+- **Rastreabilidade**: o `build-logs.md` de cada feature registra o porquê de cada decisão técnica, o `tests.md` documenta o que foi testado e o `review.md` guarda o histórico de validações contra a spec — mesmo sem acompanhar a implementação em tempo real.
 - **Escopo controlado**: tarefas pequenas e critérios de aceite objetivos evitam que a IA amplie o escopo ou implemente algo fora da spec.
 - **Execução em lote com segurança**: o modo autônomo processa a fila de specs pendentes de ponta a ponta, mas com guarda-corpos fixos (branch própria por spec, sem push, sem PR, proibições do `ai-instructions.md` prevalecem sobre a autonomia).
 - **Padronização**: o mesmo fluxo e os mesmos arquivos podem ser reaproveitados em qualquer projeto, só copiando as pastas `.ai/` e `.claude/`.
 
 ## Como usar
 
-1. Copie `.ai/` e `.claude/` para a raiz do seu projeto.
-2. Rode a **Fase 0 (setup)** com o prompt "0. Setup" de [`.ai/prompts.md`](.ai/prompts.md): a IA analisa o projeto real e preenche `architecture.md` e a seção "Informações específicas do projeto" do `ai-instructions.md`.
-3. Para cada feature, copie `.ai/specs/template/` para `.ai/specs/<nome-da-feature>/` e siga as fases de [`.ai/INSTRUCTIONS.md`](.ai/INSTRUCTIONS.md) com os prompts prontos de [`.ai/prompts.md`](.ai/prompts.md).
+1. Copie `.ai/`, `.claude/`, `AGENTS.md` e `CLAUDE.md` para a raiz do seu projeto. Se o projeto já tiver um `CLAUDE.md`, não o substitua: acrescente a linha `@AGENTS.md` no topo dele.
+2. Rode a **Fase 0 (setup)** com o prompt "0. Setup" de [`.ai/prompts.md`](.ai/prompts.md): a IA analisa o projeto real e preenche `architecture.md` e a seção "Informações específicas do projeto" do `ai-instructions.md`. Se a raiz agrupar vários projetos, ela também cria um `.ai/architecture-<pasta-do-projeto>.md` para cada um ([`.ai/README.md`](.ai/README.md), seção 3.2).
+3. Para cada feature, copie `.ai/specs/template/` para `.ai/specs/NNN-<nome-da-feature>/`, onde `NNN` é o maior número já usado em `.ai/specs/` e `.ai/specs/concluidos/` + 1 (ex.: `008-exportar-relatorio`), e siga as fases de [`.ai/INSTRUCTIONS.md`](.ai/INSTRUCTIONS.md) com os prompts prontos de [`.ai/prompts.md`](.ai/prompts.md).
 4. (Opcional) Com várias specs prontas acumuladas, execute tudo em lote com `/executar-specs-pendentes` no Claude Code — veja [`.claude/README.md`](.claude/README.md).
 
 Conceito e fundamentos em [`.ai/README.md`](.ai/README.md).

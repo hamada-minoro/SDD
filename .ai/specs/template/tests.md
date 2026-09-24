@@ -16,7 +16,7 @@
 
 | Teste | Cobre (RN/critério de aceite) | Cenário | Resultado esperado | Status |
 |---|---|---|---|---|
-| `should ...` | RN01 | | | ⬜ pendente / ✅ passou / ❌ falhou |
+| `should ...` | RN01, CA01 | | | ⬜ pendente / ✅ passou / ❌ falhou |
 
 ## Testes de integração
 
