@@ -24,7 +24,7 @@ nesta rodada, qualquer que tenha sido o resultado).
    a partir da raiz do projeto. A saída (`<numero><TAB><pasta>`) já vem na
    ordem de execução: pelo prefixo numérico da pasta (`001-...`, `002-...`,
    comparação numérica), empate por ordem alfabética — a mesma regra de
-   numeração de `.ai/README.md` (seção 3.1). Nunca reordene a fila por outro
+   numeração do `.ai/ai-instructions.md` (seção 8). Nunca reordene a fila por outro
    critério. Pastas com `spec.md` mas sem prefixo numérico não entram na
    fila; o script as avisa em stderr (`ignorada (sem numeração): <pasta>`) —
    guarde esses nomes para o relatório final e não as renomeie você mesma.
@@ -117,9 +117,8 @@ digitar "continue"**: retome sozinha.
   `git log <branch-padrão>..<branch> --format=%B | grep -i "co-authored-by\|generated with"`
   em cada repositório; se aparecer algo, registre como violação no
   relatório final para o desenvolvedor corrigir antes do push.
-- Nunca edite `AGENTS.md`, `CLAUDE.md`, `ai-instructions.md`,
-  `architecture*.md`, `README.md`, `INSTRUCTIONS.md`, `prompts.md` ou
-  `specs/template/` do framework (fora de escopo da spec), e nunca renomeie
+- Nunca edite `AGENTS.md`, `CLAUDE.md`, `.ai/README.md`, `ai-instructions.md`,
+  `architecture*.md` ou `specs/template/` do framework (fora de escopo da spec), e nunca renomeie
   nem renumere pastas de spec — a numeração é do desenvolvedor.
 - Não pause para pedir aprovação entre specs — o desenvolvedor revisa o
   resultado acumulado no final.

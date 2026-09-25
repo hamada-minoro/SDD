@@ -9,16 +9,18 @@ e a raiz do projeto. Sua missão é executar o ciclo completo de Spec Driven
 Development para essa spec — e somente ela — de forma autônoma, sem pausar
 para aprovação humana.
 
-As regras abaixo são o seu contrato; em conflito, o `.ai/ai-instructions.md`
-do projeto prevalece.
+As regras abaixo são o que muda no modo autônomo. Todo o resto vem do
+`.ai/ai-instructions.md`, que é o contrato SDD do framework e prevalece em
+caso de conflito.
 
-**Relação com o `AGENTS.md` da raiz:** você está sempre no caminho "a
-tarefa JÁ tem spec" (seção 2.2 do `AGENTS.md`). Você nunca cria uma spec
+**Relação com o `.ai/ai-instructions.md`:** você está sempre no caminho "a
+tarefa já tem spec" (seção 5 dele). Você nunca cria uma spec
 nova, nunca calcula numeração e nunca renomeia ou renumera a pasta da
 spec: o número (`NNN-`) define a ordem da fila e é da orquestradora e do
 desenvolvedor. A diferença do modo autônomo é que não há aprovação humana
 entre as etapas: se `plan.md`/`tasks.md` faltarem, você os cria e segue
-direto para a implementação.
+direto para a implementação. Pelo mesmo motivo, você não espera
+confirmação depois do resumo de entendimento da seção 5.2 do `.ai/ai-instructions.md`.
 
 **Arquivos que você pode e não pode editar:**
 
@@ -30,7 +32,7 @@ direto para a implementação.
   limitação de ambiente nova (item 4 da seção 1) e atualizar o que a sua
   feature mudou ou melhorou na infraestrutura de testes (seção 5).
 - **Nunca edita:** `AGENTS.md`, `CLAUDE.md`, `.ai/README.md`,
-  `.ai/INSTRUCTIONS.md`, `.ai/prompts.md`, `.ai/ai-instructions.md`,
+  `.ai/ai-instructions.md`,
   `.ai/architecture.md`, `.ai/architecture-*.md`, `.ai/specs/template/`,
   a pasta de outras specs e `.ai/specs/concluidos/`.
 
@@ -70,12 +72,13 @@ arquitetura precisa ler. Tudo fora dela está fora do seu contexto.
 
 ## 1. Leitura obrigatória — nesta ordem, sem pular etapa
 
-1. `.ai/README.md` — fluxo e convenções do framework, inclusive a
-   numeração das pastas de spec.
-2. `.ai/ai-instructions.md`
-3. `.ai/architecture.md` (em raiz com vários projetos, só como mapa do
+1. `.ai/ai-instructions.md`: o contrato SDD do framework (regras,
+   procedimentos, comentários, commits, "Informações específicas do
+   projeto"). O `.ai/README.md` é manual para humanos e não precisa ser
+   lido.
+2. `.ai/architecture.md` (em raiz com vários projetos, só como mapa do
    ecossistema)
-4. `.ai/infraestrutura-testes.md` (obrigatório) — limitações conhecidas do
+3. `.ai/infraestrutura-testes.md` (obrigatório) — limitações conhecidas do
    ambiente local de testes. **Não redescubra nem re-investigue** o que já
    está documentado lá: se um teste de integração/E2E for inviável por
    limitação listada nesse arquivo, cite-o na pendência do `review.md` e
@@ -83,16 +86,17 @@ arquitetura precisa ler. Tudo fora dela está fora do seu contexto.
    (não específica da sua spec), acrescente-a lá em vez de documentá-la só
    no seu `review.md`. Se o arquivo **não existir**, não o crie: registre a
    ausência no `build-logs.md` da spec, rode só os testes unitários e os
-   comandos documentados no `ai-instructions.md`, e deixe os testes de
+   comandos documentados na seção "Informações específicas do projeto" do
+   `.ai/ai-instructions.md`, e deixe os testes de
    integração/E2E como pendência no `review.md` (motivo: ambiente de testes
    não documentado, rodar a Fase 0).
-5. `.ai/specs/<spec>/spec.md`
-6. **Somente** os `.ai/architecture-<projeto>.md` listados na tabela
+4. `.ai/specs/<spec>/spec.md`
+5. **Somente** os `.ai/architecture-<projeto>.md` listados na tabela
    "Projetos e arquiteturas envolvidos" da `spec.md`, conforme a seção 0
    (tabela ausente ou arquivo faltando também seguem a seção 0).
-7. `.ai/specs/<spec>/plan.md` (se existir)
-8. `.ai/specs/<spec>/tasks.md` (se existir)
-9. `.ai/specs/<spec>/build-logs.md`, `tests.md` e `review.md`, se já
+6. `.ai/specs/<spec>/plan.md` (se existir)
+7. `.ai/specs/<spec>/tasks.md` (se existir)
+8. `.ai/specs/<spec>/build-logs.md`, `tests.md` e `review.md`, se já
    existirem (decisões, testes e validações anteriores desta spec).
 
 ## 1b. Estado de execução (retomada determinística)
@@ -184,12 +188,12 @@ working tree sujo) e encerre reportando isso.
   tempo real). Resolva com a interpretação mais conservadora (menor escopo,
   mais alinhada aos padrões do projeto) e registre decisão e premissa em
   `.ai/specs/<spec>/build-logs.md`.
-- **Áreas sensíveis:** se a spec tocar algo listado no `ai-instructions.md`
-  como "serviços, módulos ou arquivos que nunca devem ser alterados sem
+- **Áreas sensíveis:** se a spec tocar algo listado na seção "Informações
+  específicas do projeto" do `.ai/ai-instructions.md` como "serviços, módulos ou arquivos que nunca devem ser alterados sem
   validação humana explícita" — implemente normalmente, mas registre em
   `.ai/specs/<spec>/build-logs.md` uma entrada iniciada por `⚠️ ÁREA SENSÍVEL:`
   explicando o que foi tocado e por quê.
-- **Proibições absolutas do `ai-instructions.md`** (diferente de área
+- **Proibições absolutas do projeto** (`.ai/ai-instructions.md`, diferente de área
   sensível): se a spec pedir explicitamente algo listado como "o que não
   pode ser aprovado" nas regras de revisão do projeto, **não implemente
   essa parte**, documente o conflito em `build-logs.md` e conclua como
@@ -233,8 +237,8 @@ working tree sujo) e encerre reportando isso.
 ## 5. Testes
 
 - Escreva os testes exigidos pelo `plan.md` e pelas regras do
-  `ai-instructions.md` (use as ferramentas de teste documentadas na seção
-  "Informações específicas do projeto" e os scripts do próprio projeto).
+  `.ai/ai-instructions.md` (use as ferramentas de teste documentadas na
+  seção "Informações específicas do projeto" dele e os scripts do próprio projeto).
 - Rode lint, testes e build do(s) projeto(s) tocado(s), conforme os scripts
   do próprio `package.json` (ou equivalente da stack).
 - Documente cada teste em `.ai/specs/<spec>/tests.md` (formato de

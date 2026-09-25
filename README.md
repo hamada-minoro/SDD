@@ -1,32 +1,51 @@
 # SDD — Spec Driven Development com IA
 
-Framework pronto para guiar o desenvolvimento de software com IA a partir de documentos estruturados, em vez de prompts soltos. Basta copiar as pastas [`.ai/`](.ai/README.md) e [`.claude/`](.claude/README.md) para qualquer projeto e começar a usar.
+Framework pronto para guiar o desenvolvimento de software com IA a partir de documentos estruturados, em vez de prompts soltos. Basta copiar `.ai/`, `.claude/`, `AGENTS.md` e `CLAUDE.md` para qualquer projeto e começar a usar.
+
+**Manual completo (instalação, fases, prompts, modo autônomo): [`.ai/README.md`](.ai/README.md).**
 
 ## O que existe aqui
 
-- **[`.ai/`](.ai/README.md)** — o framework em si: arquivos de contexto (`README.md`, `INSTRUCTIONS.md`, `prompts.md`, `ai-instructions.md`, `architecture.md`, `infraestrutura-testes.md`) e o ciclo de specs por feature (`spec.md`, `plan.md`, `tasks.md`, `build-logs.md`, `tests.md`, `review.md`), em pastas numeradas (`001-...`, `002-...`) que definem a ordem de execução, com templates prontos em `specs/template/` e ciclo de vida pendente → `specs/concluidos/`.
-- **[`AGENTS.md`](AGENTS.md)** — porta de entrada para qualquer agente de IA: obriga a ler `.ai/README.md` antes de qualquer tarefa, criar spec/plan/tasks quando a tarefa ainda não tem spec e ler os arquivos obrigatórios (`ai-instructions.md`, `architecture.md`, `infraestrutura-testes.md`) quando já tem. O [`CLAUDE.md`](CLAUDE.md) só importa o `AGENTS.md`, para o Claude Code.
-- **[`.claude/`](.claude/README.md)** — camada opcional de automação para o Claude Code: a skill `/executar-specs-pendentes` (orquestradora da fila) e o subagente `executor-spec-sdd`, que executa o ciclo SDD completo de uma spec por vez, em contexto zerado, commitando em branch própria — sem nunca dar push nem abrir PR.
+- **[`AGENTS.md`](AGENTS.md)**: roteador leve que os agentes de IA carregam em toda sessão. Diz quando o SDD se aplica (qualquer alteração de código) e traz as regras que valem sempre. O [`CLAUDE.md`](CLAUDE.md) só importa o `AGENTS.md`, para o Claude Code.
+- **[`.ai/ai-instructions.md`](.ai/ai-instructions.md)**: o contrato SDD da IA, lido só quando a tarefa envolve SDD, com todas as regras e procedimentos (como criar spec/plan/tasks, como implementar, quais arquivos ler, regras de código e commit).
+- **[`.ai/`](.ai/README.md)**: o manual para desenvolvedores (`README.md`), o contrato SDD da IA (`ai-instructions.md`), a arquitetura do projeto (`architecture.md` e, em raiz com vários projetos, um `architecture-<projeto>.md` por projeto), a referência do ambiente de testes (`infraestrutura-testes.md`) e o ciclo de specs por feature (`spec.md`, `plan.md`, `tasks.md`, `build-logs.md`, `tests.md`, `review.md`). As specs ficam em pastas numeradas (`001-...`, `002-...`) que definem a ordem de execução, com templates em `specs/template/` e ciclo de vida pendente → `specs/concluidos/`.
+- **`.claude/`**: camada opcional de automação para o Claude Code. A skill `/executar-specs-pendentes` orquestra a fila, e o subagente `executor-spec-sdd` executa o ciclo SDD completo de uma spec por vez, em contexto zerado, commitando em branch própria, sem nunca dar push nem abrir PR.
 
 ## Por que existe
 
-Para fugir do *vibe coding*: a IA gerando código a partir de uma ideia vaga, sem contrato, sem plano e sem validação. Sem documentos, é fácil a IA inventar regra de negócio, fugir da arquitetura existente ou tomar decisões técnicas que ninguém revisou — e o desenvolvedor só descobre isso lendo o diff inteiro depois.
+Para fugir do *vibe coding*: a IA gerando código a partir de uma ideia vaga, sem contrato, sem plano e sem validação. O fluxo obriga a IA a entender o contexto, ler a spec, seguir um plano, executar tarefa por tarefa e registrar toda decisão relevante.
 
-O fluxo da `.ai/` obriga a IA a entender o contexto, ler a spec, seguir um plano, executar tarefa por tarefa e registrar toda decisão relevante antes de codar.
+## O que agrega
 
-## O que agrega ao desenvolvimento
+- **Contexto consistente e enxuto**: a IA lê a arquitetura, as regras de negócio e as decisões anteriores antes de implementar, e só as arquiteturas dos projetos que a feature toca.
+- **Rastreabilidade**: `build-logs.md` guarda o porquê de cada decisão, `tests.md` o que foi testado e `review.md` o histórico de validações contra a spec.
+- **Escopo controlado**: tarefas pequenas e critérios de aceite objetivos.
+- **Execução em lote com segurança**: branch própria por spec, sem push, sem PR, e as regras do `ai-instructions.md` prevalecem sobre a autonomia.
+- **Padronização**: o mesmo fluxo em qualquer projeto.
 
-- **Contexto consistente**: a IA sempre lê arquitetura, regras de negócio e decisões anteriores antes de implementar — inclusive, quando a raiz agrupa vários projetos (APIs, frontends, microsserviços), o mapa do ecossistema em `architecture.md` e um `architecture-<projeto>.md` obrigatório para cada projeto.
-- **Rastreabilidade**: o `build-logs.md` de cada feature registra o porquê de cada decisão técnica, o `tests.md` documenta o que foi testado e o `review.md` guarda o histórico de validações contra a spec — mesmo sem acompanhar a implementação em tempo real.
-- **Escopo controlado**: tarefas pequenas e critérios de aceite objetivos evitam que a IA amplie o escopo ou implemente algo fora da spec.
-- **Execução em lote com segurança**: o modo autônomo processa a fila de specs pendentes de ponta a ponta, mas com guarda-corpos fixos (branch própria por spec, sem push, sem PR, proibições do `ai-instructions.md` prevalecem sobre a autonomia).
-- **Padronização**: o mesmo fluxo e os mesmos arquivos podem ser reaproveitados em qualquer projeto, só copiando as pastas `.ai/` e `.claude/`.
+## Consumo de tokens por rodada
 
-## Como usar
+Estimativa de quanto a IA consome ao ler os arquivos obrigatórios do SDD, antes de começar o trabalho de fato:
 
-1. Copie `.ai/`, `.claude/`, `AGENTS.md` e `CLAUDE.md` para a raiz do seu projeto. Se o projeto já tiver um `CLAUDE.md`, não o substitua: acrescente a linha `@AGENTS.md` no topo dele.
-2. Rode a **Fase 0 (setup)** com o prompt "0. Setup" de [`.ai/prompts.md`](.ai/prompts.md): a IA analisa o projeto real e preenche `architecture.md` e a seção "Informações específicas do projeto" do `ai-instructions.md`. Se a raiz agrupar vários projetos, ela também cria um `.ai/architecture-<pasta-do-projeto>.md` para cada um ([`.ai/README.md`](.ai/README.md), seção 3.2).
-3. Para cada feature, copie `.ai/specs/template/` para `.ai/specs/NNN-<nome-da-feature>/`, onde `NNN` é o maior número já usado em `.ai/specs/` e `.ai/specs/concluidos/` + 1 (ex.: `008-exportar-relatorio`), e siga as fases de [`.ai/INSTRUCTIONS.md`](.ai/INSTRUCTIONS.md) com os prompts prontos de [`.ai/prompts.md`](.ai/prompts.md).
-4. (Opcional) Com várias specs prontas acumuladas, execute tudo em lote com `/executar-specs-pendentes` no Claude Code — veja [`.claude/README.md`](.claude/README.md).
+| Arquivo | Sessão sem SDD | Escrever spec, plan e tasks | Implementar uma spec | Implementar no modo autônomo (por spec) |
+|---|---:|---:|---:|---:|
+| `AGENTS.md` (carregado sempre) | 500 | 500 | 500 | 500 |
+| `.ai/ai-instructions.md` | — | 6.200 | 6.200 | 6.200 |
+| `.ai/architecture.md` | — | 800 | 800 | 800 |
+| `.ai/infraestrutura-testes.md` | — | 800 | 800 | 800 |
+| `spec.md` | — | 800 | 800 | 800 |
+| `plan.md` | — | 500 | 500 | 500 |
+| `tasks.md` | — | 600 | 600 | 600 |
+| `build-logs.md` | — | — | 500 | 500 |
+| `tests.md` | — | — | 400 | 400 |
+| `review.md` | — | — | 400 | 400 |
+| `.claude/agents/executor-spec-sdd.md` (system prompt do subagente) | — | — | — | 5.900 |
+| **Total** | **~500** | **~10.200** | **~11.500** | **~17.400** |
 
-Conceito e fundamentos em [`.ai/README.md`](.ai/README.md).
+Como ler a tabela:
+
+- **Estimativa de ±20%**, calculada pelo tamanho dos arquivos (cerca de 3,3 caracteres por token em português, mais o custo das linhas na leitura).
+- **O mínimo de cada rodada.** `architecture.md`, `infraestrutura-testes.md` e os arquivos da feature foram medidos como templates vazios. Preenchidos com o projeto real e com a feature, eles crescem. Esse crescimento é contexto útil, não custo do framework.
+- **Fora da conta:** os `architecture-<projeto>.md` da tabela "Projetos e arquiteturas envolvidos" da spec. Em raiz com vários projetos, some um arquivo por projeto que a feature altera.
+- **Ao escrever a spec**, os templates de `spec.md`, `plan.md` e `tasks.md` são lidos para preenchimento. `build-logs.md`, `tests.md` e `review.md` só são copiados.
+- **O `.ai/README.md`** é o manual para desenvolvedores e não entra em nenhuma rodada.

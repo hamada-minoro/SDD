@@ -1,7 +1,7 @@
 # Review: Nome da Feature
 
 > Histórico de revisões da implementação contra a `spec.md`.
-> Cada execução do prompt "4. Validar contra a spec" (`prompts.md`) deve adicionar uma nova entrada abaixo — nunca sobrescreva uma entrada anterior.
+> Cada validação (seção 6 do `.ai/ai-instructions.md`) adiciona uma nova entrada abaixo — nunca sobrescreva uma entrada anterior.
 
 ---
 

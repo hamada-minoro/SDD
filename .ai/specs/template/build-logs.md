@@ -6,7 +6,7 @@
 >
 > Adicione uma entrada sempre que: escolher entre abordagens técnicas possíveis, desviar do plan.md/tasks.md, preencher uma lacuna da spec.md, introduzir uma dependência nova, ou tomar qualquer decisão que não seria óbvia só de olhar o código depois.
 >
-> Entradas sobre áreas sensíveis (lista de "nunca alterar sem validação humana" do `ai-instructions.md`) começam o título com `⚠️ ÁREA SENSÍVEL:`.
+> Entradas sobre áreas sensíveis (lista de "nunca alterar sem validação humana" da seção "Informações específicas do projeto" do `.ai/ai-instructions.md`) começam o título com `⚠️ ÁREA SENSÍVEL:`.
 
 ## Modelo de entrada
 

@@ -2,7 +2,7 @@
 
 > **Projeto único:** preencha todas as seções abaixo, exceto "Ecossistema".
 >
-> **Raiz com vários projetos** (microsserviços, APIs e frontends separados, projetos complementares): este arquivo é o **mapa do ecossistema**. Preencha "Visão geral", "Ecossistema", "Autenticação e autorização" (a parte compartilhada), "Integrações externas", "Decisões arquiteturais" e "Restrições" com o que vale para todos. Os detalhes de cada projeto vão em `.ai/architecture-<pasta-do-projeto>.md`, um arquivo por projeto, usando as seções "Stack" a "Restrições" deste modelo. Veja `README.md`, seção 3.2.
+> **Raiz com vários projetos** (microsserviços, APIs e frontends separados, projetos complementares): este arquivo é o **mapa do ecossistema**. Preencha "Visão geral", "Ecossistema", "Autenticação e autorização" (a parte compartilhada), "Integrações externas", "Decisões arquiteturais" e "Restrições" com o que vale para todos. Os detalhes de cada projeto vão em `.ai/architecture-<pasta-do-projeto>.md`, um arquivo por projeto, usando as seções "Stack" a "Restrições" deste modelo. Veja a seção 9 do `.ai/ai-instructions.md`.
 
 ## Visão geral
 
