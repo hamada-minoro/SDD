@@ -77,6 +77,13 @@ Descreva o resultado esperado.
 - Erro de integração:
 - Erro inesperado:
 
+## Casos de borda
+
+> Situações nos limites do comportamento esperado: entradas vazias ou extremas, limites de intervalo, empates, volumes grandes, paginação, concorrência, fuso horário. Diga o que o sistema faz em cada uma.
+
+- Caso:
+  - Comportamento esperado:
+
 ## Critérios de aceite
 
 > Cada critério tem um ID fixo (`CA01`, `CA02`...). No código, ele é citado como `<número da spec>-CAxx` (ex.: `007-CA01`). Nunca renumere um critério já implementado.

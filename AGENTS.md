@@ -4,7 +4,7 @@
 
 ## Quando o SDD se aplica
 
-**Antes de qualquer tarefa que crie, altere ou implemente código do projeto, leia `.ai/ai-instructions.md` e siga-o.** O mesmo vale para pedidos que envolvam spec, plan, tasks, implementação, validação ou revisão de uma feature, setup/Fase 0 do projeto ou a fila de specs (`.ai/specs/`). Esse arquivo é o contrato SDD completo: fluxo, arquivos a ler, regras de código e de commit.
+**Antes de qualquer alteração de código do projeto, por menor que seja (inclusive uma correção rápida de bug ou uma linha), leia `.ai/ai-instructions.md` e siga-o.** O mesmo vale para pedidos que envolvam spec, plan, tasks, implementação, validação ou revisão de uma feature, setup/Fase 0 do projeto ou a fila de specs (`.ai/specs/`). Esse arquivo é o contrato SDD completo: fluxo, arquivos a ler, regras de código e de commit.
 
 Nesses casos, nenhum código é escrito antes de a tarefa ter spec, plan e tasks aprovados pelo desenvolvedor.
 
