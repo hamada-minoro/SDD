@@ -1,6 +1,6 @@
 # Tests: Nome da Feature
 
-> Registro dos testes unitários (e de integração, quando aplicável) escritos para esta feature.
+> Registro dos testes unitários, de integração e de usuário pela interface (quando aplicáveis) desta feature.
 > Cada teste deve referenciar a regra de negócio ou critério de aceite da `spec.md` que ele cobre.
 > Atualize este arquivo conforme os testes forem escritos durante o bloco "Testes" do `tasks.md`.
 
@@ -23,6 +23,14 @@
 | Teste | Cobre (RN/critério de aceite) | Cenário | Resultado esperado | Status |
 |---|---|---|---|---|
 | | | | | |
+
+## Teste de usuário frontend + backend (quando aplicável)
+
+> Roteiro em `plano-teste-usuario.md`; execução e artefatos locais em `evidencias/`. Registre o observado, não apenas o esperado. Bloqueado não equivale a aprovado.
+
+| Passo | Cobre (RN/CA) | Esperado | Observado | Confirmação no backend | Evidência | Status |
+|---|---|---|---|---|---|---|
+| | | | | | | ⬜ pendente / ✅ passou / ❌ falhou / 🚫 bloqueado |
 
 ## Casos de borda cobertos
 

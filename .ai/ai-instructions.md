@@ -25,6 +25,7 @@ Você é uma engenheira auxiliar deste projeto, não uma geradora de código por
 | `.ai/architecture.md` | Arquitetura do projeto; em raiz com vários projetos, o mapa do ecossistema | Sempre, antes de spec/plan/código |
 | `.ai/architecture-<projeto>.md` | Arquitetura de um projeto da raiz (seção 9) | **Só** os da tabela "Projetos e arquiteturas envolvidos" da spec |
 | `.ai/infraestrutura-testes.md` | Referência verificada do ambiente local de testes (portas, containers, limitações) | Sempre, antes de planejar ou rodar testes |
+| `.ai/teste-usuario-frontend-backend.md` | Procedimento reutilizável de teste de usuário pela interface com frontend e backend | Ao planejar ou executar uma jornada de tela ponta a ponta |
 | `.ai/specs/template/` | Modelos dos arquivos de feature | Ao criar ou completar arquivos de feature |
 | `.ai/specs/NNN-nome/` | Specs pendentes ou em andamento | A da tarefa |
 | `.ai/specs/concluidos/NNN-nome/` | Specs finalizadas e aprovadas | Só como histórico ou para numeração |
@@ -39,6 +40,7 @@ Arquivos de cada feature (`.ai/specs/NNN-nome-da-feature/`), copiados de `specs/
 - **`build-logs.md`**: diário de decisões **desta** feature (não existe build-logs global). Recebe uma entrada nova, no final e sem sobrescrever as anteriores, sempre que você: escolher entre abordagens possíveis; desviar do `plan.md`/`tasks.md`; preencher uma lacuna da spec; introduzir dependência, biblioteca ou padrão novo; ou tomar qualquer decisão que não seria óbvia só de olhar o código depois. Registre no momento da decisão, no formato do template (Decisão / Motivo / Alternativas descartadas / Impacto / Divergência do plano). Registra o raciocínio, **não o diff**: nada de "criei o arquivo X com a função Y". Entradas sobre áreas sensíveis (seção 12) começam o título com `⚠️ ÁREA SENSÍVEL:`.
 - **`tests.md`**: cada teste escrito, com a RN/CA que cobre, cenário, resultado esperado e status, além dos casos de borda cobertos e não cobertos (com o motivo). Atualizado durante o bloco de testes.
 - **`review.md`**: histórico das validações contra a `spec.md`. Cada validação é uma **entrada nova**; nunca sobrescreva as anteriores.
+- **`plano-teste-usuario.md`**: roteiro opcional por spec com interface, copiado do template; registra ambiente, pré-requisitos, passos, resultados literais esperados, RN/CA, evidências, retomada e limpeza. O procedimento comum fica em `.ai/teste-usuario-frontend-backend.md`.
 
 ## 3. Qual procedimento seguir
 
@@ -54,13 +56,13 @@ Não exigem spec: perguntas, explicações e análises que não alteram código,
 ## 4. Criar uma feature (spec, plan e tasks)
 
 1. Leia `.ai/architecture.md` e `.ai/infraestrutura-testes.md`.
-2. Calcule o próximo número (seção 8) e crie a pasta com `cp -r .ai/specs/template .ai/specs/NNN-nome-da-feature`. Não precisa ler agora os templates de `build-logs.md`, `tests.md` e `review.md`.
+2. Calcule o próximo número (seção 8) e crie a pasta com `cp -r .ai/specs/template .ai/specs/NNN-nome-da-feature`. Remova `plano-teste-usuario.md` da cópia se a spec não tiver jornada frontend + backend. Não precisa ler agora os templates de `build-logs.md`, `tests.md` e `review.md`.
 3. **Primeiro, deixe explícito quais projetos e arquiteturas estão envolvidos.** Com base no mapa do `architecture.md`, preencha a tabela "Projetos e arquiteturas envolvidos" da `spec.md`: pasta de cada projeto que a feature **altera**, caminho do `.ai/architecture-<projeto>.md` dele e o que muda. Em projeto único, uma linha com `(projeto único)` e `—`.
 4. Leia **somente** as arquiteturas dessa tabela. Se alguma não existir, pare e rode o setup desse projeto (seção 10).
 5. **Escreva a `spec.md`** seguindo o template, com IDs `RNxx`/`CAxx`, critérios de aceite objetivos e "Fora de escopo" definido. Liste à parte as dúvidas, lacunas e riscos encontrados em vez de preenchê-los com suposições. **Se alguma dúvida mudar uma regra de negócio** (o que a feature faz, calcula, valida ou permite), pare depois da spec, apresente as perguntas e só siga para o passo 6 com a resposta do desenvolvedor. Dúvidas que não mudam regra seguem registradas como premissas na spec.
 6. **Revise a spec criticamente**, como revisora técnica e funcional: regras incompletas ou contraditórias, casos de erro e de borda faltando, permissões, critérios não verificáveis. Proponha as melhorias e aplique-as antes de seguir para o plano.
-7. **Escreva o `plan.md`**: repita a tabela de projetos com a ordem entre eles (ex.: API antes do frontend que a consome), sem projetos a mais ou a menos. Siga a arquitetura; se uma abordagem fugir dela, explique claramente o motivo. Baseie a estratégia de testes no `infraestrutura-testes.md`.
-8. **Escreva o `tasks.md`**: tarefas pequenas por área, na ordem do plano (o objetivo é nunca implementar tudo de uma vez). A "Preparação" lista um item "Ler .ai/architecture-<projeto>.md" por arquivo da tabela, com o caminho real.
+7. **Escreva o `plan.md`**: repita a tabela de projetos com a ordem entre eles (ex.: API antes do frontend que a consome), sem projetos a mais ou a menos. Siga a arquitetura; se uma abordagem fugir dela, explique claramente o motivo. Baseie a estratégia de testes no `infraestrutura-testes.md`. Para jornada frontend + backend, leia também `.ai/teste-usuario-frontend-backend.md` e planeje a validação de tela.
+8. **Escreva o `tasks.md`**: tarefas pequenas por área, na ordem do plano (o objetivo é nunca implementar tudo de uma vez). A "Preparação" lista um item "Ler .ai/architecture-<projeto>.md" por arquivo da tabela, com o caminho real. Se a spec tiver jornada de tela, inclua preparar e executar `plano-teste-usuario.md`, além de registrar o resultado em `tests.md`/`review.md`.
 9. **Pare e apresente** ao desenvolvedor um resumo de spec, plan e tasks, com as dúvidas, lacunas e riscos em aberto. Nenhum código até ele aprovar explicitamente.
 
 ## 5. Implementar uma feature que já tem spec
@@ -72,6 +74,7 @@ Não exigem spec: perguntas, explicações e análises que não alteram código,
 3. `spec.md` da pasta da spec
 4. **Somente** os `.ai/architecture-<projeto>.md` da tabela da spec
 5. `plan.md` → `tasks.md` → `build-logs.md` → `tests.md` → `review.md` da pasta, os que existirem
+6. Para jornada de tela frontend + backend: `.ai/teste-usuario-frontend-backend.md` → `plano-teste-usuario.md` da spec, se existir
 
 Esses arquivos existem para: não assumir portas, containers ou comandos errados (infraestrutura); respeitar os limites do projeto alterado (arquiteturas); e não repetir discussões nem contradizer decisões já tomadas, não duplicar testes, não perder lacunas de cobertura e não refazer revisões do zero (`build-logs`, `tests`, `review`).
 
@@ -99,6 +102,7 @@ Responda com:
 - Se o `plan.md` estiver desatualizado ou incompleto, ou se a spec tiver lacuna, pare e proponha o ajuste ou a decisão. Não siga improvisando.
 - Registre no `build-logs.md` toda decisão que não estava explícita no `plan.md`/`tasks.md`, no momento em que for tomada (seção 2).
 - No bloco de testes, documente cada teste no `tests.md`.
+- Quando a spec tiver jornada de tela frontend + backend, prepare o roteiro da spec a partir de `.ai/specs/template/plano-teste-usuario.md` e execute-o conforme `.ai/teste-usuario-frontend-backend.md`. Identifique ações que gravam e o escopo de autorização; não presuma que a aprovação de spec/plan/tasks autoriza efeitos externos irreversíveis. Registre bloqueios e cobertura não provada como pendência.
 - Siga as regras de código e commit da seção 7.
 
 ### 5.4 Retomar uma feature em andamento
@@ -115,6 +119,7 @@ Revise a implementação contra a `spec.md`:
 - existe algo fora do escopo? A arquitetura foi respeitada?
 - todas as tarefas do `tasks.md` foram concluídas? Os testes necessários foram executados?
 - cada critério de aceite e regra de negócio relevante tem teste no `tests.md`? O que não tiver vira pendência, não é ignorado.
+- quando houver jornada frontend + backend, o roteiro, as evidências, a confirmação do backend e a limpeza foram registrados? Distinga falha funcional de bloqueio de ambiente; nenhum dos dois vira teste aprovado sem execução.
 - `build-logs.md` com as decisões da entrega? Commits e comentários de acordo com a seção 7?
 
 Registre o resultado como **nova entrada** no `review.md`, no formato do template: data, critérios de aceite cumpridos e não cumpridos, regras de negócio cobertas e não cobertas, erros e permissões, testes conferidos, divergências da spec, pendências e conclusão. A conclusão é **"Aprovada"** só se lint, testes e build aplicáveis passaram e todos os critérios foram cumpridos. Caso contrário, é "Aprovada com pendências" ou "Reprovada", com o motivo. Informe ao desenvolvedor o que foi concluído e o que ficou pendente.

@@ -58,6 +58,7 @@ Response:
 - Testes unitários:
 - Testes de integração:
 - Testes manuais:
+- Jornada frontend + backend (se houver): passos e RN/CA a conferir pela interface, leitura de confirmação no backend, ambiente e dados necessários. Use `.ai/teste-usuario-frontend-backend.md` e detalhe o roteiro em `plano-teste-usuario.md`.
 
 ## Riscos técnicos
 

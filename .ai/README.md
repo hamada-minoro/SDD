@@ -44,11 +44,13 @@ projeto/
 ├── AGENTS.md                          # roteador leve, carregado em toda sessão: quando o SDD se aplica
 ├── CLAUDE.md                          # só importa o AGENTS.md (@AGENTS.md), para o Claude Code
 ├── .ai/
+│   ├── .gitignore                     # exclui credenciais e evidências locais das specs
 │   ├── README.md                      # este manual (para humanos)
 │   ├── ai-instructions.md             # contrato SDD da IA: regras e procedimentos (lido nas tarefas SDD)
 │   ├── architecture.md                # arquitetura; em raiz multiprojeto, o mapa do ecossistema
 │   ├── architecture-<projeto>.md      # obrigatório em raiz multiprojeto: um por pasta de projeto
 │   ├── infraestrutura-testes.md       # referência verificada do ambiente local de testes
+│   ├── teste-usuario-frontend-backend.md # procedimento reutilizável de teste de tela ponta a ponta
 │   └── specs/
 │       ├── template/                  # modelos dos arquivos de feature
 │       ├── concluidos/                # specs aprovadas (mantêm o número)
@@ -59,7 +61,10 @@ projeto/
 │           ├── tasks.md
 │           ├── build-logs.md
 │           ├── tests.md
-│           └── review.md
+│           ├── review.md
+│           ├── plano-teste-usuario.md  # roteiro opcional se houver jornada de tela
+│           ├── .env                    # credenciais locais ignoradas pelo Git
+│           └── evidencias/             # diário e artefatos locais ignorados pelo Git
 ├── .claude/                           # opcional: automação para Claude Code (seção 8)
 │   ├── agents/executor-spec-sdd.md
 │   └── skills/executar-specs-pendentes/
@@ -74,16 +79,18 @@ projeto/
 | `ai-instructions.md` | Como a IA deve agir? | Comportamento, limites, procedimentos e regras da IA no SDD |
 | `architecture.md` | Como o sistema está organizado? | Padrões técnicos e arquitetura (em multiprojeto, o mapa) |
 | `infraestrutura-testes.md` | Como o ambiente de testes funciona de verdade? | Portas, containers e limitações verificadas, para a IA não assumir errado |
+| `teste-usuario-frontend-backend.md` | Como testar uma jornada de tela ponta a ponta? | Procedimento comum de navegador, segurança, evidências e encerramento |
 | `spec.md` | O que precisa existir? | Problema, regras, fluxos e aceite, com foco em comportamento, não em código |
 | `plan.md` | Como vamos construir? | Estratégia técnica de implementação |
 | `tasks.md` | Quais passos executar? | Checklist objetiva de desenvolvimento |
 | `build-logs.md` | O que aconteceu e por quê? | Decisões reais tomadas durante a implementação, com o motivo |
-| `tests.md` | O que foi testado? | Testes unitários e de integração cruzados com as regras e critérios da spec |
+| `tests.md` | O que foi testado? | Testes unitários, de integração e de usuário cruzados com as regras e critérios da spec |
 | `review.md` | A entrega cumpre a spec? | Histórico das validações contra a spec (uma entrada nova por validação) |
+| `plano-teste-usuario.md` | Qual jornada executar nesta spec? | Roteiro opcional com passos, resultados esperados, RN/CA, evidências e retomada |
 
 Pense nos arquivos como camadas de contrato: `ai-instructions.md` é o contrato de comportamento da IA, `architecture.md` o mapa técnico, `spec.md` o contrato funcional, `plan.md` a estratégia, `tasks.md` a execução controlada, `build-logs.md` a memória das decisões, `tests.md` a evidência de teste e `review.md` a memória das validações.
 
-`spec.md`, `plan.md` e `tasks.md` são escritos **antes** de codar. `build-logs.md` é escrito **durante** e **depois**. `tests.md` é escrito no bloco de testes, e `review.md` a cada validação.
+`spec.md`, `plan.md` e `tasks.md` são escritos **antes** de codar. `build-logs.md` é escrito **durante** e **depois**. `tests.md` é escrito no bloco de testes, e `review.md` a cada validação. Para specs com jornada frontend + backend, o template também cria `plano-teste-usuario.md`; remova-o quando não se aplicar.
 
 ---
 
@@ -200,6 +207,15 @@ Valide a implementação da spec 008-nome-da-feature.
 ```
 
 A IA confere critérios de aceite, regras de negócio, erros, permissões, alinhamento frontend/backend, escopo, arquitetura e cobertura de testes. Ela registra uma **nova entrada** no `review.md`, com a conclusão "Aprovada", "Aprovada com pendências" ou "Reprovada". Critério sem teste aparece como pendência, não é ignorado.
+
+Para uma jornada frontend + backend, peça também:
+
+```txt
+Execute o plano-teste-usuario.md da spec 008-nome-da-feature com o navegador visível,
+registre evidências e atualize tests.md e review.md.
+```
+
+A IA usa o procedimento de `.ai/teste-usuario-frontend-backend.md`, preenche o roteiro com dados deste projeto, confere os pré-requisitos e executa os passos. O navegador visível exige um desktop; em ambiente sem tela ela registra o modo headless. Credenciais e evidências ficam locais e são ignoradas pelo Git em `.ai/specs/`; o resultado essencial permanece em `tests.md` e `review.md`. Ações que gravam precisam estar dentro da autorização recebida; efeitos externos irreversíveis exigem aprovação específica. Passos bloqueados por infraestrutura ficam pendentes.
 
 ### 6.5 Fase 8: atualização da documentação
 

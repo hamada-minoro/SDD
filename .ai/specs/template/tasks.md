@@ -7,6 +7,7 @@
 - [ ] Ler .ai/ai-instructions.md
 - [ ] Ler .ai/architecture.md (mapa do ecossistema)
 - [ ] Ler .ai/infraestrutura-testes.md
+- [ ] Se houver jornada frontend + backend, ler .ai/teste-usuario-frontend-backend.md
 - [ ] Ler spec.md
 - [ ] Ler .ai/architecture-pasta-do-projeto.md
 - [ ] Ler plan.md
@@ -46,6 +47,8 @@
 - [ ] Conferir critérios de aceite
 - [ ] Conferir casos de erro
 - [ ] Executar testes
+- [ ] Se houver jornada frontend + backend, preencher e executar plano-teste-usuario.md, registrar evidências seguras e confirmar o resultado por leitura no backend
+- [ ] Se houver jornada frontend + backend, atualizar tests.md e review.md com cobertura, bloqueios, dados criados e limpeza
 
 ## Documentação
 

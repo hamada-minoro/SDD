@@ -40,6 +40,18 @@ Notas importantes:
 Descreva os comandos, na ordem, para colocar o ambiente de pé (docker
 compose, seeds, servidores dev, variáveis obrigatórias).
 
+## Teste de usuário frontend + backend
+
+> Preencha com fatos verificados deste projeto antes de executar `plano-teste-usuario.md`. O procedimento geral está em `.ai/teste-usuario-frontend-backend.md`. Não registre valores de credenciais.
+
+- URL do frontend de teste e como confirmar que ele aponta para as APIs de teste:
+- APIs locais/remotas envolvidas, portas e health checks (código/resposta esperados):
+- Configuração de homologação necessária e como desfazer alterações temporárias:
+- Dependências remotas e horários de disponibilidade verificados:
+- Conta/permissões de teste e nomes das variáveis exigidas (sem valores):
+- Como preparar e limpar dados de teste com segurança:
+- Limitações do navegador visível (`--headed`) neste ambiente:
+
 ## Limitações conhecidas
 
 Liste aqui, em seções datadas, as limitações verificadas do ambiente local

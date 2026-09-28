@@ -35,6 +35,9 @@
 
 - Testes relevantes em `tests.md` conferidos: sim/não
 - Testes faltando para cobrir esta revisão:
+- Jornada frontend + backend (se aplicável): passos executados, RN/CA comprovados, leitura de confirmação no backend e evidências:
+- Passos bloqueados, falhas e cobertura não provada:
+- Dados criados no ambiente (IDs), limpeza realizada ou pendente:
 
 ### Fora de escopo identificado
 
